@@ -2,13 +2,14 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '@entities/user.entity';
 import { Profile } from '@entities/profile.entity';
 
+
 export const typeORMConfig: TypeOrmModuleOptions = {
   type: 'mysql', //Database 설정
-  host: '13.125.15.222',
-  port: 3306,
-  username: 'admin',
-  password: 'healthboy1@',
-  database: 'healthboy',
+  host: process.env.DB_HOST,
+  port: +process.env.DB_PORT,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   entities: [User, Profile],
   migrations: [__dirname + '/migration/*{.ts,.js}'],
   logging: true,
