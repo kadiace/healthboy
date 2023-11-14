@@ -7,9 +7,12 @@
   "arrowParens": "avoid",
   "endOfLine": "auto",
   "importOrder": [
-    "<THIRD_PARTY_MODULES>",
-    "^@utils/(.*)$",
+    "^@nestjs/(.*)$",
     "^@common/(.*)$",
+    "^@entities/(.*)$",
+    "@repositories/(.*)$",
+    "^@api-interfaces/(.*)$",
+    "<THIRD_PARTY_MODULES>",
     "^[./]"
   ],
   "importOrderSeparation": true,

@@ -1,6 +1,7 @@
+import { TypeOrmModuleOptions } from '@nestjs/typeorm'
+
 import { Profile } from '@entities/profile.entity'
 import { User } from '@entities/user.entity'
-import { TypeOrmModuleOptions } from '@nestjs/typeorm'
 
 export const typeORMConfig: TypeOrmModuleOptions = {
   type: 'mysql', //Database 설정

@@ -19,7 +19,9 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@entities/*": ["src/databases/entities/*"],
-      "@repositories/*": ["src/databases/repositories/*"]
+      "@repositories/*": ["src/databases/repositories/*"],
+      "@users/*": ["src/modules/users/*"],
+      "@gyms/*": ["src/modules/gyms/*"]
     }
   }
 }
