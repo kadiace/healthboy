@@ -18,6 +18,11 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@configs/*": ["src/configs/*"],
+      "@interfaces": ["src/interfaces"],
+      "@interfaces/*": ["src/interfaces/*"],
+      "@utils": ["src/utils"],
+      "@utils/*": ["src/utils/*"],
       "@entities/*": ["src/databases/entities/*"],
       "@repositories/*": ["src/databases/repositories/*"],
       "@users/*": ["src/modules/users/*"],

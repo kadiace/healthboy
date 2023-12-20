@@ -9,9 +9,15 @@
   "importOrder": [
     "^@nestjs/(.*)$",
     "^@common/(.*)$",
+    "^@configs/(.*)$",
+    "^@utils$",
+    "^@utils/(.*)$",
+    "^@interfaces$",
+    "^@interfaces/(.*)$",
     "^@entities/(.*)$",
-    "@repositories/(.*)$",
-    "^@api-interfaces/(.*)$",
+    "^@repositories/(.*)$",
+    "^@users/(.*)$",
+    "^@gyms/(.*)$",
     "<THIRD_PARTY_MODULES>",
     "^[./]"
   ],
