@@ -16,8 +16,12 @@
     "^@interfaces/(.*)$",
     "^@entities/(.*)$",
     "^@repositories/(.*)$",
-    "^@users/(.*)$",
     "^@gyms/(.*)$",
+    "^@profiles/(.*)$",
+    "^@registrations/(.*)$",
+    "^@reservations/(.*)$",
+    "^@staffs/(.*)$",
+    "^@users/(.*)$",
     "<THIRD_PARTY_MODULES>",
     "^[./]"
   ],

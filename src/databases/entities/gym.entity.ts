@@ -1,10 +1,24 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { User } from '@entities/user.entity'
+
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
 
 @Entity()
 export class Gym {
   @PrimaryGeneratedColumn()
-  id: number
+  id!: number
 
-  @Column()
-  name: string
+  /** Columns */
+  @Column('varchar')
+  name!: string
+
+  /** Relations */
+  @ManyToMany(() => User)
+  @JoinTable()
+  owners!: User[]
 }

@@ -1,13 +1,21 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { User } from '@entities/user.entity'
+
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm'
 
 @Entity()
 export class Profile {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryColumn('int')
+  userId!: User['id']
 
-  @Column()
-  firstName: string
+  @OneToOne(() => User, user => user.profile)
+  user!: User
 
-  @Column()
-  lastName: string
+  @Column('varchar')
+  firstName!: string
+
+  @Column('varchar')
+  lastName!: string
+
+  @Column('varchar')
+  imageURL!: string
 }

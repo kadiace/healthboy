@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common'
 
-import { GymsService } from './gyms.service'
+import { GymsService } from '@gyms/gyms.service'
 
 @Controller('gyms')
 export class GymsController {

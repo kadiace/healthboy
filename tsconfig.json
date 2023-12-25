@@ -25,8 +25,12 @@
       "@utils/*": ["src/utils/*"],
       "@entities/*": ["src/databases/entities/*"],
       "@repositories/*": ["src/databases/repositories/*"],
-      "@users/*": ["src/modules/users/*"],
-      "@gyms/*": ["src/modules/gyms/*"]
+      "@gyms/*": ["src/modules/gyms/*"],
+      "@profiles/*": ["src/modules/profiles/*"],
+      "@registrations/*": ["src/modules/registrations/*"],
+      "@reservations/*": ["src/modules/reservations/*"],
+      "@staffs/*": ["src/modules/staffs/*"],
+      "@users/*": ["src/modules/users/*"]
     }
   }
 }

@@ -1,16 +1,18 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Profile } from '@entities/profile.entity'
+
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number
+  id!: number
 
-  @Column()
-  email: string
+  @Column('varchar')
+  email!: string
 
-  @Column()
-  password: string
+  @Column('varchar')
+  password!: string
 
-  @Column()
-  phoneNum: string
+  @OneToOne(() => Profile, profile => profile.user)
+  profile!: Profile
 }
