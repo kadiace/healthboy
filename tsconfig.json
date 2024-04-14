@@ -23,6 +23,8 @@
       "@interfaces/*": ["src/interfaces/*"],
       "@utils": ["src/utils"],
       "@utils/*": ["src/utils/*"],
+      "@guards": ["src/guards"],
+      "@guards/*": ["src/guards/*"],
       "@entities/*": ["src/databases/entities/*"],
       "@repositories/*": ["src/databases/repositories/*"],
       "@gyms/*": ["src/modules/gyms/*"],
