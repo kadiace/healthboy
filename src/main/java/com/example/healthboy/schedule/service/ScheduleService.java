@@ -1,11 +1,10 @@
 package com.example.healthboy.schedule.service;
 
 import com.example.healthboy.schedule.entity.Schedule;
-import com.example.healthboy.schedule.entity.ScheduleUser;
+import com.example.healthboy.schedule.entity.ScheduleProfile;
 import com.example.healthboy.schedule.repository.ScheduleRepository;
-import com.example.healthboy.schedule.repository.ScheduleUserRepository;
-import com.example.healthboy.user.entity.User;
-import com.example.healthboy.user.repository.UserRepository;
+import com.example.healthboy.schedule.repository.ScheduleProfileRepository;
+import com.example.healthboy.user.entity.Profile;
 
 import jakarta.transaction.Transactional;
 
@@ -22,26 +21,21 @@ public class ScheduleService {
     private ScheduleRepository scheduleRepository;
 
     @Autowired
-    private ScheduleUserRepository scheduleUserRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private ScheduleProfileRepository scheduleProfileRepository;
 
     @Transactional
-    public Schedule createSchedule(Schedule schedule, String username) {
-        User user = userRepository.findByEmail(username);
+    public Schedule createSchedule(Schedule schedule, Profile profile) {
         schedule.setUrl(generateUniqueUrl());
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        ScheduleUser scheduleUser = new ScheduleUser();
-        scheduleUser.setSchedule(savedSchedule);
-        scheduleUser.setUser(user);
-        scheduleUserRepository.save(scheduleUser);
+        ScheduleProfile scheduleProfile = new ScheduleProfile();
+        scheduleProfile.setSchedule(savedSchedule);
+        scheduleProfile.setProfile(profile);
+        scheduleProfileRepository.save(scheduleProfile);
         return savedSchedule;
     }
 
-    public List<Schedule> getMySchedules(String username) {
-        User user = userRepository.findByEmail(username);
-        return scheduleRepository.findByUsersContains(user);
+    public List<Schedule> getMySchedules(Profile profile) {
+        return scheduleProfileRepository.findSchedulesByProfile(profile);
     }
 
     public Schedule getSchedule(String id) {
@@ -49,21 +43,19 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void joinSchedule(String id, String username) {
-        User user = userRepository.findByEmail(username);
+    public void joinSchedule(String id, Profile profile) {
         Schedule schedule = getSchedule(id);
-        ScheduleUser scheduleUser = new ScheduleUser();
-        scheduleUser.setSchedule(schedule);
-        scheduleUser.setUser(user);
-        scheduleUserRepository.save(scheduleUser);
+        ScheduleProfile scheduleProfile = new ScheduleProfile();
+        scheduleProfile.setSchedule(schedule);
+        scheduleProfile.setProfile(profile);
+        scheduleProfileRepository.save(scheduleProfile);
     }
 
     @Transactional
-    public void leaveSchedule(String id, String username) {
-        User user = userRepository.findByEmail(username);
+    public void leaveSchedule(String id, Profile profile) {
         Schedule schedule = getSchedule(id);
-        ScheduleUser scheduleUser = scheduleUserRepository.findByScheduleAndUser(schedule, user);
-        scheduleUserRepository.delete(scheduleUser);
+        ScheduleProfile scheduleProfile = scheduleProfileRepository.findByScheduleAndProfile(schedule, profile);
+        scheduleProfileRepository.delete(scheduleProfile);
     }
 
     private String generateUniqueUrl() {

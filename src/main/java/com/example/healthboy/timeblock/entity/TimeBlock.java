@@ -1,6 +1,6 @@
 package com.example.healthboy.timeblock.entity;
 
-import com.example.healthboy.schedule.entity.ScheduleUser;
+import com.example.healthboy.schedule.entity.ScheduleProfile;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -13,8 +13,8 @@ public class TimeBlock {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_user_id", nullable = false)
-    private ScheduleUser ScheduleUser;
+    @JoinColumn(name = "schedule_profile_id", nullable = false)
+    private ScheduleProfile scheduleProfile;
 
     @Column(nullable = false)
     private LocalDateTime startTime;
@@ -31,12 +31,12 @@ public class TimeBlock {
         this.id = id;
     }
 
-    public ScheduleUser getScheduleUser() {
-        return ScheduleUser;
+    public ScheduleProfile getScheduleProfile() {
+        return scheduleProfile;
     }
 
-    public void setScheduleUser(ScheduleUser ScheduleUser) {
-        this.ScheduleUser = ScheduleUser;
+    public void setScheduleProfile(ScheduleProfile scheduleProfile) {
+        this.scheduleProfile = scheduleProfile;
     }
 
     public LocalDateTime getStartTime() {

@@ -49,10 +49,9 @@ public class UserService {
             profile = new Profile();
             profile.setUser(user);
         }
-        profile.setName(createUserDto.getName());
+        profile.setFirstName(createUserDto.getFirstName());
+        profile.setLastName(createUserDto.getLastName());
         profile.setProfileImage(createUserDto.getProfileImage());
-        profile.setPhoneNumber(createUserDto.getPhoneNumber());
-        profile.setDateOfBirth(createUserDto.getDateOfBirth());
         profileRepository.save(profile);
 
         UserDto userDto = new UserDto();

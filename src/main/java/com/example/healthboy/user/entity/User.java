@@ -1,10 +1,6 @@
 package com.example.healthboy.user.entity;
 
-import com.example.healthboy.schedule.entity.Schedule;
-
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 public class User {
@@ -15,9 +11,6 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
-
-    @ManyToMany(mappedBy = "users")
-    private Set<Schedule> schedules = new HashSet<>();
 
     @Column(unique = true)
     private String googleId;
@@ -43,14 +36,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Set<Schedule> getSchedules() {
-        return schedules;
-    }
-
-    public void setSchedules(Set<Schedule> schedules) {
-        this.schedules = schedules;
     }
 
     public String getGoogleId() {

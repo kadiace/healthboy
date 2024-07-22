@@ -1,24 +1,24 @@
 package com.example.healthboy.schedule.entity;
 
-import com.example.healthboy.user.entity.User;
+import com.example.healthboy.user.entity.Profile;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "schedule_user")
-public class ScheduleUser {
+@Table(name = "schedule_profile")
+public class ScheduleProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_url")
+    @JoinColumn(name = "schedule_url", nullable = false)
     private Schedule schedule;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile profile;
 
     // Getters and setters
     public Long getId() {
@@ -37,11 +37,11 @@ public class ScheduleUser {
         this.schedule = schedule;
     }
 
-    public User getUser() {
-        return user;
+    public Profile getProfile() {
+        return profile;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setProfile(Profile profile) {
+        this.profile = profile;
     }
 }

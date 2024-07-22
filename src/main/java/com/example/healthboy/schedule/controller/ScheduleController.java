@@ -2,11 +2,14 @@ package com.example.healthboy.schedule.controller;
 
 import com.example.healthboy.schedule.entity.Schedule;
 import com.example.healthboy.schedule.service.ScheduleService;
+import com.example.healthboy.user.entity.Profile;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,14 +20,16 @@ public class ScheduleController {
     private ScheduleService scheduleService;
 
     @PostMapping
-    public ResponseEntity<Schedule> createSchedule(@RequestBody Schedule schedule, Principal principal) {
-        Schedule createdSchedule = scheduleService.createSchedule(schedule, principal.getName());
+    public ResponseEntity<Schedule> createSchedule(HttpServletRequest request, @RequestBody Schedule schedule) {
+        Profile profile = (Profile) request.getAttribute("profile");
+        Schedule createdSchedule = scheduleService.createSchedule(schedule, profile);
         return ResponseEntity.ok(createdSchedule);
     }
 
     @GetMapping
-    public ResponseEntity<List<Schedule>> getMySchedules(Principal principal) {
-        List<Schedule> schedules = scheduleService.getMySchedules(principal.getName());
+    public ResponseEntity<List<Schedule>> getMySchedules(HttpServletRequest request) {
+        Profile profile = (Profile) request.getAttribute("profile");
+        List<Schedule> schedules = scheduleService.getMySchedules(profile);
         return ResponseEntity.ok(schedules);
     }
 
@@ -35,14 +40,16 @@ public class ScheduleController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Void> joinSchedule(@PathVariable String id, Principal principal) {
-        scheduleService.joinSchedule(id, principal.getName());
+    public ResponseEntity<Void> joinSchedule(HttpServletRequest request, @PathVariable String id) {
+        Profile profile = (Profile) request.getAttribute("profile");
+        scheduleService.joinSchedule(id, profile);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> leaveSchedule(@PathVariable String id, Principal principal) {
-        scheduleService.leaveSchedule(id, principal.getName());
+    public ResponseEntity<Void> leaveSchedule(HttpServletRequest request, @PathVariable String id) {
+        Profile profile = (Profile) request.getAttribute("profile");
+        scheduleService.leaveSchedule(id, profile);
         return ResponseEntity.ok().build();
     }
 }

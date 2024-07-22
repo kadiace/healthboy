@@ -6,10 +6,9 @@ public class CreateUserDto {
     private String email;
     private String uuid;
     private SSOType ssoType;
-    private String name;
+    private String firstName;
+    private String lastName;
     private String profileImage;
-    private String phoneNumber;
-    private String dateOfBirth;
 
     // Getters and setters
     public String getEmail() {
@@ -36,12 +35,20 @@ public class CreateUserDto {
         this.ssoType = ssoType;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getProfileImage() {
@@ -50,21 +57,5 @@ public class CreateUserDto {
 
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
     }
 }

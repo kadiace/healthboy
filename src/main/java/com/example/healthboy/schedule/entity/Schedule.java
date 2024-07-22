@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.example.healthboy.user.entity.User;
-
 @Entity
 public class Schedule {
 
@@ -18,9 +16,8 @@ public class Schedule {
     @Column(length = 30)
     private String description;
 
-    @ManyToMany
-    @JoinTable(name = "schedule_user", joinColumns = @JoinColumn(name = "schedule_url"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "schedule")
+    private Set<ScheduleProfile> scheduleProfiles = new HashSet<>();
 
     // Getters and setters
     public String getUrl() {
@@ -47,11 +44,11 @@ public class Schedule {
         this.description = description;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<ScheduleProfile> getScheduleProfiles() {
+        return scheduleProfiles;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setScheduleProfiles(Set<ScheduleProfile> scheduleProfiles) {
+        this.scheduleProfiles = scheduleProfiles;
     }
 }
