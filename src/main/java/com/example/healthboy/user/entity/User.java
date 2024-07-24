@@ -21,6 +21,9 @@ public class User {
     @Column(unique = true)
     private String githubId;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Profile profile;
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -60,5 +63,17 @@ public class User {
 
     public void setGithubId(String githubId) {
         this.githubId = githubId;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
+    public boolean isValid() {
+        return this.email != null && !this.email.isEmpty() && this.profile != null;
     }
 }

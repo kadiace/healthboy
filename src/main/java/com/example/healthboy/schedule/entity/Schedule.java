@@ -16,7 +16,7 @@ public class Schedule {
     @Column(length = 30)
     private String description;
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
     private Set<ScheduleProfile> scheduleProfiles = new HashSet<>();
 
     // Getters and setters

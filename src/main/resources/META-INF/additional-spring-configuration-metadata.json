@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "google.clientId",
+      "type": "java.lang.String",
+      "description": "The client id for Google OAuth2"
+    }
+  ]
+}

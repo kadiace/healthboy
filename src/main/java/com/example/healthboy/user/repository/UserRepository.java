@@ -6,4 +6,10 @@ import com.example.healthboy.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
+
+    User findByGoogleId(String googleId);
+
+    User findByFacebookId(String facebookId);
+
+    User findByGithubId(String githubId);
 }

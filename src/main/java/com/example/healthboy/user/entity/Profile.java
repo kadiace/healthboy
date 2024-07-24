@@ -20,12 +20,12 @@ public class Profile {
     private String lastName;
     private String profileImage;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @OneToMany(mappedBy = "profile")
+    @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
     private Set<ScheduleProfile> scheduleProfiles = new HashSet<>();
 
     // Getters and setters
