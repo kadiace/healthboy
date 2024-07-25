@@ -3,9 +3,7 @@ package com.example.healthboy.user.dto;
 public class UserDto {
     private Long id;
     private String email;
-    private String googleId;
-    private String facebookId;
-    private String githubId;
+    private ProfileDto profile;
 
     // Getters and setters
     public Long getId() {
@@ -24,27 +22,11 @@ public class UserDto {
         this.email = email;
     }
 
-    public String getGoogleId() {
-        return googleId;
+    public ProfileDto getProfile() {
+        return profile;
     }
 
-    public void setGoogleId(String googleId) {
-        this.googleId = googleId;
-    }
-
-    public String getFacebookId() {
-        return facebookId;
-    }
-
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
-    }
-
-    public String getGithubId() {
-        return githubId;
-    }
-
-    public void setGithubId(String githubId) {
-        this.githubId = githubId;
+    public void setProfile(ProfileDto profile) {
+        this.profile = profile;
     }
 }
