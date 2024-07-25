@@ -3,6 +3,7 @@ package com.example.healthboy.user.entity;
 import jakarta.persistence.*;
 
 @Entity
+@NamedEntityGraph(name = "User.profile", attributeNodes = @NamedAttributeNode("profile"))
 public class User {
 
     @Id
@@ -21,7 +22,7 @@ public class User {
     @Column(unique = true)
     private String githubId;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Profile profile;
 
     // Getters and setters

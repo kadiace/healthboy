@@ -27,9 +27,9 @@ public class JwtRequestInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
-        // Pass guard when path is /login
+        // Pass guard when path is /api/auths/sign-up
         String requestUri = request.getRequestURI();
-        if (requestUri.equals("/api/login/sign-up")) {
+        if (requestUri.equals("/api/auths/sign-up")) {
             return true;
         }
 
@@ -40,7 +40,6 @@ public class JwtRequestInterceptor implements HandlerInterceptor {
 
         if (authHeader != null && authHeader.startsWith("Bearer ") && ssoType != null) {
             String token = authHeader.substring(7);
-            boolean isTokenValid = false;
             User user = null;
 
             switch (ssoType) {
@@ -49,14 +48,13 @@ public class JwtRequestInterceptor implements HandlerInterceptor {
                     if (payload != null) {
                         String googleId = payload.getSubject();
                         user = userRepository.findByGoogleId(googleId);
-                        isTokenValid = true;
                     }
                     break;
                 default:
                     break;
             }
 
-            if (isTokenValid && user != null) {
+            if (user != null) {
                 request.setAttribute("user", user);
                 return true;
             }

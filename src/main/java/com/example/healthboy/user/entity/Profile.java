@@ -20,7 +20,7 @@ public class Profile {
     private String lastName;
     private String profileImage;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;

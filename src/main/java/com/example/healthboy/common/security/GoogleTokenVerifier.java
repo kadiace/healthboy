@@ -23,14 +23,14 @@ public class GoogleTokenVerifier {
                 .build();
     }
 
-    public GoogleIdToken.Payload verifyGoogleToken(String idTokenString) throws GeneralSecurityException, IOException {
-
-        GoogleIdToken idToken = null;
-
-        idToken = verifier.verify(idTokenString);
-
-        if (idToken != null) {
-            return idToken.getPayload();
+    public GoogleIdToken.Payload verifyGoogleToken(String idTokenString) {
+        try {
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                return idToken.getPayload();
+            }
+        } catch (GeneralSecurityException | IOException e) {
+            System.out.println("Token verification failed: " + e.getMessage());
         }
         return null;
     }
