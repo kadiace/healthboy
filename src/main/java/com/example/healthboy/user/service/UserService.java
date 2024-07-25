@@ -6,26 +6,32 @@ import org.springframework.stereotype.Service;
 
 import com.example.healthboy.user.dto.UserUpdateDto;
 import com.example.healthboy.user.entity.Profile;
+import com.example.healthboy.user.entity.User;
 import com.example.healthboy.user.repository.ProfileRepository;
+import com.example.healthboy.user.repository.UserRepository;
 
 @Service
 public class UserService {
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ProfileRepository profileRepository;
 
-    public ResponseEntity<String> updateProfile(Long id, UserUpdateDto userUpdateDto) {
+    public ResponseEntity<String> updateProfile(Profile profile, UserUpdateDto userUpdateDto) {
 
-        Profile profile = profileRepository.findById(id).orElse(null);
-        if (profile == null) {
-            return ResponseEntity.badRequest().body("Unsupported SSO Type");
-        }
         profile.setFirstName(userUpdateDto.getFirstName());
         profile.setLastName(userUpdateDto.getLastName());
         profile.setProfileImage(userUpdateDto.getProfileImage());
         profileRepository.save(profile);
 
         return ResponseEntity.ok("Profile update successfully");
+    }
+
+    public ResponseEntity<String> deleteUser(User user) {
+        userRepository.delete(user);
+        return ResponseEntity.ok("User delete successfully");
     }
 
 }

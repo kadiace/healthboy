@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,12 +28,6 @@ public class UserController {
 
     @Autowired
     private ScheduleService scheduleService;
-
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateProfile(@PathVariable Long id,
-            @Valid @RequestBody UserUpdateDto userUpdateDto) {
-        return userService.updateProfile(id, userUpdateDto);
-    }
 
     @GetMapping
     public ResponseEntity<UserDto> getProfile(HttpServletRequest request) {
@@ -59,4 +54,21 @@ public class UserController {
         Profile profile = user.getProfile();
         return ResponseEntity.ok(scheduleService.getMySchedules(profile));
     }
+
+    @PutMapping
+    public ResponseEntity<String> updateProfile(HttpServletRequest request,
+            @Valid @RequestBody UserUpdateDto userUpdateDto) {
+
+        User user = (User) request.getAttribute("user");
+        Profile profile = user.getProfile();
+
+        return userService.updateProfile(profile, userUpdateDto);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteUser(HttpServletRequest request) {
+        User user = (User) request.getAttribute("user");
+        return userService.deleteUser(user);
+    }
+
 }

@@ -1,8 +1,15 @@
 package com.example.healthboy.user.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @NamedEntityGraph(name = "User.profile", attributeNodes = @NamedAttributeNode("profile"))
 public class User {
 
@@ -24,6 +31,8 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Profile profile;
+
+    private LocalDateTime deletedAt;
 
     // Getters and setters
     public Long getId() {
@@ -74,6 +83,15 @@ public class User {
         this.profile = profile;
     }
 
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    // Original Method
     public boolean isValid() {
         return this.email != null && !this.email.isEmpty() && this.profile != null;
     }

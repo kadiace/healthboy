@@ -1,13 +1,19 @@
 package com.example.healthboy.user.entity;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.example.healthboy.schedule.entity.ScheduleProfile;
 
 import jakarta.persistence.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE profile SET deleted_at = NOW() WHERE user_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Profile {
 
     @Id
@@ -28,6 +34,8 @@ public class Profile {
 
     @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
     private Set<ScheduleProfile> scheduleProfiles = new HashSet<>();
+
+    private LocalDateTime deletedAt;
 
     // Getters and setters
     public Long getId() {
@@ -76,5 +84,13 @@ public class Profile {
 
     public void setScheduleProfiles(Set<ScheduleProfile> scheduleProfiles) {
         this.scheduleProfiles = scheduleProfiles;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }
