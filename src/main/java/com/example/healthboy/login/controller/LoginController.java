@@ -28,7 +28,7 @@ public class LoginController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/sign-in")
+    @GetMapping("/sign-up")
     public ResponseEntity<String> singIn(HttpServletRequest request) throws GeneralSecurityException, IOException {
         String authHeader = request.getHeader("Authorization");
         String rawSsoType = request.getHeader("SSO-Type");

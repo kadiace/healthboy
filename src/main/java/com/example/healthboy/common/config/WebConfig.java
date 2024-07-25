@@ -6,6 +6,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.example.healthboy.common.middleware.LoggingInterceptor;
+import com.example.healthboy.common.middleware.JwtRequestInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -13,6 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
         registry.addInterceptor(new LoggingInterceptor());
+        registry.addInterceptor(new JwtRequestInterceptor());
     }
 
 }
