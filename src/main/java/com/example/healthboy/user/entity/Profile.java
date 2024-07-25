@@ -18,6 +18,7 @@ public class Profile {
 
     @Column(length = 20, nullable = false)
     private String lastName;
+
     private String profileImage;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

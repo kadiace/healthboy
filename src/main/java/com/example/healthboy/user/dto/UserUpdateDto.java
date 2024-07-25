@@ -1,19 +1,16 @@
 package com.example.healthboy.user.dto;
 
-public class ProfileDto {
-    private Long id;
+import jakarta.validation.constraints.NotNull;
+
+public class UserUpdateDto {
+
+    @NotNull(message = "First name must not be null")
     private String firstName;
+
+    @NotNull(message = "Last name must not be null")
     private String lastName;
+
     private String profileImage;
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getFirstName() {
         return firstName;
