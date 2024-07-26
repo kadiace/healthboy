@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +39,7 @@ public class ScheduleController {
     }
 
     @PostMapping("/join/{url}")
-    public ResponseEntity<String> joinSchedule(HttpServletRequest request, @PathVariable String url)
-            throws BadRequestException {
+    public ResponseEntity<String> joinSchedule(HttpServletRequest request, @PathVariable String url) {
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
         scheduleService.joinSchedule(url, profile);
@@ -49,7 +47,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/{url}")
-    public ResponseEntity<ScheduleDto> getSchedule(@PathVariable String url) throws BadRequestException {
+    public ResponseEntity<ScheduleDto> getSchedule(@PathVariable String url) {
         Schedule schedule = scheduleService.getSchedule(url);
 
         ScheduleDto scheduleDto = new ScheduleDto(schedule.getUrl(), schedule.getName(),
@@ -58,7 +56,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/users/{url}")
-    public ResponseEntity<List<ProfileDto>> getScheduleMember(@PathVariable String url) throws BadRequestException {
+    public ResponseEntity<List<ProfileDto>> getScheduleMember(@PathVariable String url) {
         List<Profile> profiles = scheduleService.getScheduleMember(url);
 
         List<ProfileDto> profileDtos = profiles.stream().map(ProfileDto::new).toList();
@@ -68,7 +66,7 @@ public class ScheduleController {
 
     @PutMapping("/{url}")
     public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable String url,
-            @RequestBody ScheduleUpdateDto scheduleUpdateDto) throws BadRequestException {
+            @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
         Schedule updatedSchedule = scheduleService.updateSchedule(url, scheduleUpdateDto);
 
         ScheduleDto scheduleDto = new ScheduleDto(updatedSchedule.getUrl(), updatedSchedule.getName(),
@@ -78,8 +76,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/leave/{url}")
-    public ResponseEntity<String> leaveSchedule(HttpServletRequest request, @PathVariable String url)
-            throws BadRequestException {
+    public ResponseEntity<String> leaveSchedule(HttpServletRequest request, @PathVariable String url) {
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
         scheduleService.leaveSchedule(url, profile);
@@ -87,8 +84,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{url}")
-    public ResponseEntity<String> deleteSchedule(HttpServletRequest request, @PathVariable String url)
-            throws BadRequestException {
+    public ResponseEntity<String> deleteSchedule(HttpServletRequest request, @PathVariable String url) {
         scheduleService.deleteSchedule(url);
         return ResponseEntity.ok("Delete schedule successfully");
     }

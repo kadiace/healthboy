@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import com.example.healthboy.common.ApplicationException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
     private static final Logger logger = Logger.getLogger(LoggingInterceptor.class.getName());
@@ -16,9 +18,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
         HttpStatusCode status = HttpStatus.INTERNAL_SERVER_ERROR;
-
         logger.warning(ex.getMessage());
-
         return new ResponseEntity<String>(ex.getMessage(), status);
+    }
+
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<String> handleCustomException(ApplicationException ex) {
+        HttpStatus status = ex.getStatus();
+        logger.warning(ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), status);
     }
 }

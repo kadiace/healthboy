@@ -1,5 +1,6 @@
 package com.example.healthboy.schedule.service;
 
+import com.example.healthboy.common.ApplicationException;
 import com.example.healthboy.schedule.dto.ScheduleCreateDto;
 import com.example.healthboy.schedule.dto.ScheduleUpdateDto;
 import com.example.healthboy.schedule.entity.Schedule;
@@ -10,8 +11,8 @@ import com.example.healthboy.user.entity.Profile;
 
 import jakarta.transaction.Transactional;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -45,12 +46,12 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void joinSchedule(String url, Profile profile) throws BadRequestException {
+    public void joinSchedule(String url, Profile profile) {
         Schedule schedule = getSchedule(url);
 
         // Check if the ScheduleProfile already exists
         if (scheduleProfileRepository.existsByScheduleAndProfile(schedule, profile)) {
-            throw new BadRequestException("Profile is already part of this schedule");
+            throw new ApplicationException("Profile is already part of this schedule", HttpStatus.BAD_REQUEST);
         }
         ScheduleProfile scheduleProfile = new ScheduleProfile();
         scheduleProfile.setSchedule(schedule);
@@ -58,21 +59,22 @@ public class ScheduleService {
         scheduleProfileRepository.save(scheduleProfile);
     }
 
-    public Schedule getSchedule(String url) throws BadRequestException {
-        return scheduleRepository.findById(url).orElseThrow(() -> new BadRequestException("Schedule not found"));
-    }
+    public Schedule getSchedule(String url) {
+        return scheduleRepository.findById(url)
+                .orElseThrow(() -> new ApplicationException("Schedule not found", HttpStatus.BAD_REQUEST));
+    };
 
-    public List<Schedule> getMySchedules(Profile profile) throws BadRequestException {
+    public List<Schedule> getMySchedules(Profile profile) {
         return scheduleProfileRepository.findSchedulesByProfile(profile);
     }
 
-    public List<Profile> getScheduleMember(String url) throws BadRequestException {
+    public List<Profile> getScheduleMember(String url) {
         Schedule schedule = getSchedule(url);
         return scheduleProfileRepository.findProfilesBySchedule(schedule);
     }
 
     @Transactional
-    public Schedule updateSchedule(String url, ScheduleUpdateDto scheduleUpdateDto) throws BadRequestException {
+    public Schedule updateSchedule(String url, ScheduleUpdateDto scheduleUpdateDto) {
         Schedule schedule = getSchedule(url);
         schedule.setName(scheduleUpdateDto.getName());
         schedule.setDescription(scheduleUpdateDto.getDescription());
@@ -80,7 +82,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void leaveSchedule(String url, Profile profile) throws BadRequestException {
+    public void leaveSchedule(String url, Profile profile) {
         Schedule schedule = getSchedule(url);
         ScheduleProfile scheduleProfile = scheduleProfileRepository.findByScheduleAndProfile(schedule, profile);
         scheduleProfileRepository.delete(scheduleProfile);
@@ -92,7 +94,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deleteSchedule(String url) throws BadRequestException {
+    public void deleteSchedule(String url) {
         Schedule schedule = getSchedule(url);
         scheduleProfileRepository.deleteBySchedule(schedule);
         schedule.setDeletedAt(LocalDateTime.now());

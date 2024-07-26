@@ -1,6 +1,5 @@
 package com.example.healthboy.user.controller;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/schedules")
-    public ResponseEntity<List<ScheduleDto>> getMySchedules(HttpServletRequest request) throws BadRequestException {
+    public ResponseEntity<List<ScheduleDto>> getMySchedules(HttpServletRequest request) {
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
         List<Schedule> schedules = scheduleService.getMySchedules(profile);
