@@ -54,13 +54,13 @@ public class UserController {
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
 
-        return userService.updateProfile(profile, userUpdateDto);
+        return ResponseEntity.ok(userService.updateProfile(profile, userUpdateDto));
     }
 
     @DeleteMapping
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
         User user = (User) request.getAttribute("user");
-        return userService.deleteUser(user);
+        return ResponseEntity.ok(userService.deleteUser(user));
     }
 
 }
