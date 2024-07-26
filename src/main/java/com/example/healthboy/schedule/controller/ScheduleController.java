@@ -1,16 +1,22 @@
 package com.example.healthboy.schedule.controller;
 
+import com.example.healthboy.schedule.dto.ScheduleCreateDto;
+import com.example.healthboy.schedule.dto.ScheduleDto;
+import com.example.healthboy.schedule.dto.ScheduleUpdateDto;
 import com.example.healthboy.schedule.entity.Schedule;
 import com.example.healthboy.schedule.service.ScheduleService;
+import com.example.healthboy.user.dto.ProfileDto;
 import com.example.healthboy.user.entity.Profile;
+import com.example.healthboy.user.entity.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -20,36 +26,70 @@ public class ScheduleController {
     private ScheduleService scheduleService;
 
     @PostMapping
-    public ResponseEntity<Schedule> createSchedule(HttpServletRequest request, @RequestBody Schedule schedule) {
-        Profile profile = (Profile) request.getAttribute("profile");
-        Schedule createdSchedule = scheduleService.createSchedule(schedule, profile);
-        return ResponseEntity.ok(createdSchedule);
+    public ResponseEntity<ScheduleDto> createSchedule(HttpServletRequest request,
+            @RequestBody ScheduleCreateDto scheduleCreateDto) {
+        User user = (User) request.getAttribute("user");
+        Profile profile = user.getProfile();
+
+        Schedule createdSchedule = scheduleService.createSchedule(scheduleCreateDto, profile);
+
+        ScheduleDto scheduleDto = new ScheduleDto(createdSchedule.getUrl(), createdSchedule.getName(),
+                createdSchedule.getDescription());
+
+        return ResponseEntity.ok(scheduleDto);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Schedule>> getMySchedules(HttpServletRequest request) {
-        Profile profile = (Profile) request.getAttribute("profile");
-        List<Schedule> schedules = scheduleService.getMySchedules(profile);
-        return ResponseEntity.ok(schedules);
+    @PostMapping("/join/{url}")
+    public ResponseEntity<String> joinSchedule(HttpServletRequest request, @PathVariable String url)
+            throws BadRequestException {
+        User user = (User) request.getAttribute("user");
+        Profile profile = user.getProfile();
+        scheduleService.joinSchedule(url, profile);
+        return ResponseEntity.ok("Join schedule successfully");
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Schedule> getSchedule(@PathVariable String id) {
-        Schedule schedule = scheduleService.getSchedule(id);
-        return ResponseEntity.ok(schedule);
+    @GetMapping("/{url}")
+    public ResponseEntity<ScheduleDto> getSchedule(@PathVariable String url) throws BadRequestException {
+        Schedule schedule = scheduleService.getSchedule(url);
+
+        ScheduleDto scheduleDto = new ScheduleDto(schedule.getUrl(), schedule.getName(),
+                schedule.getDescription());
+        return ResponseEntity.ok(scheduleDto);
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<Void> joinSchedule(HttpServletRequest request, @PathVariable String id) {
-        Profile profile = (Profile) request.getAttribute("profile");
-        scheduleService.joinSchedule(id, profile);
-        return ResponseEntity.ok().build();
+    @GetMapping("/users/{url}")
+    public ResponseEntity<List<ProfileDto>> getScheduleMember(@PathVariable String url) throws BadRequestException {
+        List<Profile> profiles = scheduleService.getScheduleMember(url);
+
+        List<ProfileDto> profileDtos = profiles.stream().map(ProfileDto::new).toList();
+
+        return ResponseEntity.ok(profileDtos);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> leaveSchedule(HttpServletRequest request, @PathVariable String id) {
-        Profile profile = (Profile) request.getAttribute("profile");
-        scheduleService.leaveSchedule(id, profile);
-        return ResponseEntity.ok().build();
+    @PutMapping("/{url}")
+    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable String url,
+            @RequestBody ScheduleUpdateDto scheduleUpdateDto) throws BadRequestException {
+        Schedule updatedSchedule = scheduleService.updateSchedule(url, scheduleUpdateDto);
+
+        ScheduleDto scheduleDto = new ScheduleDto(updatedSchedule.getUrl(), updatedSchedule.getName(),
+                updatedSchedule.getDescription());
+
+        return ResponseEntity.ok(scheduleDto);
+    }
+
+    @DeleteMapping("/leave/{url}")
+    public ResponseEntity<String> leaveSchedule(HttpServletRequest request, @PathVariable String url)
+            throws BadRequestException {
+        User user = (User) request.getAttribute("user");
+        Profile profile = user.getProfile();
+        scheduleService.leaveSchedule(url, profile);
+        return ResponseEntity.ok("Leave scheudle successfully");
+    }
+
+    @DeleteMapping("/{url}")
+    public ResponseEntity<String> deleteSchedule(HttpServletRequest request, @PathVariable String url)
+            throws BadRequestException {
+        scheduleService.deleteSchedule(url);
+        return ResponseEntity.ok("Delete schedule successfully");
     }
 }

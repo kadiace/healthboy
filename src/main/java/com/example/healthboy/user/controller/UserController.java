@@ -1,14 +1,15 @@
 package com.example.healthboy.user.controller;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.healthboy.schedule.dto.ScheduleDto;
 import com.example.healthboy.schedule.entity.Schedule;
 import com.example.healthboy.schedule.service.ScheduleService;
 import com.example.healthboy.user.dto.ProfileDto;
-import com.example.healthboy.user.dto.UserDto;
-import com.example.healthboy.user.dto.UserUpdateDto;
+import com.example.healthboy.user.dto.ProfileUpdateDto;
 import com.example.healthboy.user.entity.Profile;
 import com.example.healthboy.user.entity.User;
 import com.example.healthboy.user.service.UserService;
@@ -17,7 +18,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,34 +30,27 @@ public class UserController {
     private ScheduleService scheduleService;
 
     @GetMapping
-    public ResponseEntity<UserDto> getProfile(HttpServletRequest request) {
+    public ResponseEntity<ProfileDto> getProfile(HttpServletRequest request) {
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
 
-        UserDto userDto = new UserDto();
-        ProfileDto profileDto = new ProfileDto();
+        ProfileDto profileDto = new ProfileDto(profile);
 
-        profileDto.setFirstName(profile.getFirstName());
-        profileDto.setLastName(profile.getLastName());
-        profileDto.setProfileImage(profile.getProfileImage());
-
-        userDto.setId(user.getId());
-        userDto.setEmail(user.getEmail());
-        userDto.setProfile(profileDto);
-
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(profileDto);
     }
 
     @GetMapping("/schedules")
-    public ResponseEntity<List<Schedule>> getMySchedules(HttpServletRequest request) {
+    public ResponseEntity<List<ScheduleDto>> getMySchedules(HttpServletRequest request) throws BadRequestException {
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
-        return ResponseEntity.ok(scheduleService.getMySchedules(profile));
+        List<Schedule> schedules = scheduleService.getMySchedules(profile);
+        List<ScheduleDto> scheduleDtos = schedules.stream().map(ScheduleDto::new).toList();
+        return ResponseEntity.ok(scheduleDtos);
     }
 
     @PutMapping
     public ResponseEntity<String> updateProfile(HttpServletRequest request,
-            @Valid @RequestBody UserUpdateDto userUpdateDto) {
+            @Valid @RequestBody ProfileUpdateDto userUpdateDto) {
 
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();

@@ -2,7 +2,7 @@ package com.example.healthboy.user.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public class UserUpdateDto {
+public class ProfileUpdateDto {
 
     @NotNull(message = "First name must not be null")
     private String firstName;
