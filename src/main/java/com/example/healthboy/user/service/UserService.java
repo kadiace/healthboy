@@ -22,13 +22,13 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(User user, LocalDateTime now) {
-        user.setDeletedAt(now);
+    public void deleteUser(User user) {
+        user.setDeletedAt(LocalDateTime.now());
     }
 
     @Transactional
-    public void deleteProfile(Profile profile, LocalDateTime now) {
-        profile.setDeletedAt(now);
+    public void deleteProfile(Profile profile) {
+        profile.setDeletedAt(LocalDateTime.now());
     }
 
 }

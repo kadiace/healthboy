@@ -86,8 +86,14 @@ public class ScheduleService {
         return schedule;
     }
 
+    @Transactional
     public void deleteSchedule(Schedule schedule) {
         schedule.setDeletedAt(LocalDateTime.now());
+    }
+
+    @Transactional
+    public void deleteScheduleWithNoProfiles(List<String> scheduleUrls) {
+        scheduleRepository.deleteSchedulesWithNoProfiles(scheduleUrls, LocalDateTime.now());
     }
 
     @Transactional
@@ -96,13 +102,18 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deleteScheduleProfile(Profile profile) {
+    public void deleteScheduleProfiles(Profile profile) {
         scheduleProfileRepository.deleteByProfile(profile);
     }
 
     @Transactional
-    public void deleteScheduleProfile(Schedule schedule) {
+    public void deleteScheduleProfiles(Schedule schedule) {
         scheduleProfileRepository.deleteBySchedule(schedule);
+    }
+
+    @Transactional
+    public void deleteScheduleProfiles(List<ScheduleProfile> scheduleProfiles) {
+        scheduleProfileRepository.deleteAll(scheduleProfiles);
     }
 
     private String generateUniqueUrl() {

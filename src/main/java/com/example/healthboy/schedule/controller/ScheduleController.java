@@ -136,7 +136,7 @@ public class ScheduleController {
         Schedule schedule = scheduleProfile.getSchedule();
 
         scheduleService.deleteSchedule(schedule);
-        scheduleService.deleteScheduleProfile(schedule);
+        scheduleService.deleteScheduleProfiles(schedule);
 
         return ResponseEntity.ok("Delete schedule successfully");
     }

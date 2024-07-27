@@ -17,7 +17,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -71,11 +70,15 @@ public class UserController {
 
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
-        LocalDateTime now = LocalDateTime.now();
+        List<Schedule> affectedSchedules = scheduleService.getMySchedules(profile);
+        List<String> affectedScheduleUrls = affectedSchedules.stream()
+                .map(schedule -> schedule.getUrl())
+                .toList();
 
-        userService.deleteUser(user, now);
-        userService.deleteProfile(profile, now);
-        scheduleService.deleteScheduleProfile(profile);
+        userService.deleteUser(user);
+        userService.deleteProfile(profile);
+        scheduleService.deleteScheduleProfiles(profile);
+        scheduleService.deleteScheduleWithNoProfiles(affectedScheduleUrls);
 
         return ResponseEntity.ok("User delete successfully");
     }
