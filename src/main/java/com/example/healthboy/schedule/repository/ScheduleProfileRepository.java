@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,8 +17,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ScheduleProfileRepository extends JpaRepository<ScheduleProfile, Long> {
+    @EntityGraph(value = "ScheduleProfile.withScheduleAndProfile", type = EntityGraph.EntityGraphType.LOAD)
     ScheduleProfile findByScheduleAndProfile(Schedule schedule, Profile profile);
 
+    @EntityGraph(value = "ScheduleProfile.withScheduleAndProfile", type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT sp FROM ScheduleProfile sp WHERE sp.schedule.url = :url AND sp.profile = :profile")
     ScheduleProfile findByScheduleUrlAndProfile(@Param("url") String url, @Param("profile") Profile profile);
 

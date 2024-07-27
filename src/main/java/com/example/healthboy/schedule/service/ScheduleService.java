@@ -75,19 +75,11 @@ public class ScheduleService {
     }
 
     public ScheduleProfile getScheduleProfile(String url, Profile profile) {
-        ScheduleProfile scheduleProfile = scheduleProfileRepository.findByScheduleUrlAndProfile(url, profile);
-        if (scheduleProfile == null) {
-            throw new ApplicationException("ScheduleProfile not found", HttpStatus.BAD_REQUEST);
-        }
-        return scheduleProfile;
+        return scheduleProfileRepository.findByScheduleUrlAndProfile(url, profile);
     }
 
     public ScheduleProfile getScheduleProfile(Schedule schedule, Profile profile) {
-        ScheduleProfile scheduleProfile = scheduleProfileRepository.findByScheduleAndProfile(schedule, profile);
-        if (scheduleProfile == null) {
-            throw new ApplicationException("ScheduleProfile not found", HttpStatus.BAD_REQUEST);
-        }
-        return scheduleProfile;
+        return scheduleProfileRepository.findByScheduleAndProfile(schedule, profile);
     }
 
     public long countScheduleProfile(Schedule schedule) {

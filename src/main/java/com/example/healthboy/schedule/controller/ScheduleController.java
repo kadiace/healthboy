@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,8 +59,9 @@ public class ScheduleController {
     }
 
     @GetMapping("/{url}")
-    public ResponseEntity<ScheduleDto> getSchedule(@PathVariable String url) {
-        Schedule schedule = scheduleService.getSchedule(url);
+    public ResponseEntity<ScheduleDto> getSchedule(HttpServletRequest request) {
+        ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
+        Schedule schedule = scheduleProfile.getSchedule();
 
         ScheduleDto scheduleDto = new ScheduleDto(schedule.getUrl(), schedule.getName(),
                 schedule.getDescription());
@@ -103,9 +105,10 @@ public class ScheduleController {
 
         // Delete SP
         ScheduleProfile scheduleProfile = scheduleService.getScheduleProfile(schedule, profile);
-        if (scheduleProfile != null) {
-            scheduleService.deleteScheduleProfile(scheduleProfile);
+        if (scheduleProfile == null) {
+            throw new ApplicationException("ScheduleProfile not found", HttpStatus.BAD_REQUEST);
         }
+        scheduleService.deleteScheduleProfile(scheduleProfile);
 
         // Delete Schedule when member 0
         long remainingProfiles = scheduleService.countScheduleProfile(schedule);

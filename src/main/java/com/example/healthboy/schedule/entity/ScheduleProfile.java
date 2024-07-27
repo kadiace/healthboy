@@ -10,6 +10,12 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "schedule_profile")
+@NamedEntityGraphs({
+        @NamedEntityGraph(name = "ScheduleProfile.withScheduleAndProfile", attributeNodes = {
+                @NamedAttributeNode("schedule"),
+                @NamedAttributeNode("profile")
+        })
+})
 public class ScheduleProfile {
 
     @Id
