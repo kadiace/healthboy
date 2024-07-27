@@ -48,19 +48,26 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<String> updateProfile(HttpServletRequest request,
+    public ResponseEntity<ProfileDto> updateProfile(HttpServletRequest request,
             @Valid @RequestBody ProfileUpdateDto userUpdateDto) {
 
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
+        Profile updatedProfile = userService.updateProfile(profile, userUpdateDto);
 
-        return ResponseEntity.ok(userService.updateProfile(profile, userUpdateDto));
+        ProfileDto profileDto = new ProfileDto(updatedProfile);
+
+        return ResponseEntity.ok(profileDto);
     }
 
     @DeleteMapping
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
+
         User user = (User) request.getAttribute("user");
-        return ResponseEntity.ok(userService.deleteUser(user));
+        userService.deleteUser(user);
+        scheduleService.deleteScheduleProfile(user.getProfile());
+
+        return ResponseEntity.ok("User delete successfully");
     }
 
 }

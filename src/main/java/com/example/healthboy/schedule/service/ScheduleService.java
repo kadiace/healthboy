@@ -46,8 +46,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void joinSchedule(String url, Profile profile) {
-        Schedule schedule = getSchedule(url);
+    public void joinSchedule(Schedule schedule, Profile profile) {
 
         // Check if the ScheduleProfile already exists
         if (scheduleProfileRepository.existsByScheduleAndProfile(schedule, profile)) {
@@ -60,44 +59,61 @@ public class ScheduleService {
     }
 
     public Schedule getSchedule(String url) {
-        return scheduleRepository.findById(url)
-                .orElseThrow(() -> new ApplicationException("Schedule not found", HttpStatus.BAD_REQUEST));
+        Schedule schedule = scheduleRepository.findByUrl(url);
+        if (schedule == null) {
+            throw new ApplicationException("Schedule not found", HttpStatus.BAD_REQUEST);
+        }
+        return schedule;
     };
 
     public List<Schedule> getMySchedules(Profile profile) {
         return scheduleProfileRepository.findSchedulesByProfile(profile);
     }
 
-    public List<Profile> getScheduleMember(String url) {
-        Schedule schedule = getSchedule(url);
+    public List<Profile> getScheduleMembers(Schedule schedule) {
         return scheduleProfileRepository.findProfilesBySchedule(schedule);
     }
 
-    @Transactional
-    public Schedule updateSchedule(String url, ScheduleUpdateDto scheduleUpdateDto) {
-        Schedule schedule = getSchedule(url);
+    public ScheduleProfile getScheduleProfile(String url, Profile profile) {
+        ScheduleProfile scheduleProfile = scheduleProfileRepository.findByScheduleUrlAndProfile(url, profile);
+        if (scheduleProfile == null) {
+            throw new ApplicationException("ScheduleProfile not found", HttpStatus.BAD_REQUEST);
+        }
+        return scheduleProfile;
+    }
+
+    public ScheduleProfile getScheduleProfile(Schedule schedule, Profile profile) {
+        ScheduleProfile scheduleProfile = scheduleProfileRepository.findByScheduleAndProfile(schedule, profile);
+        if (scheduleProfile == null) {
+            throw new ApplicationException("ScheduleProfile not found", HttpStatus.BAD_REQUEST);
+        }
+        return scheduleProfile;
+    }
+
+    public long countScheduleProfile(Schedule schedule) {
+        return scheduleProfileRepository.countBySchedule(schedule);
+    }
+
+    public Schedule updateSchedule(Schedule schedule, ScheduleUpdateDto scheduleUpdateDto) {
         schedule.setName(scheduleUpdateDto.getName());
         schedule.setDescription(scheduleUpdateDto.getDescription());
         return schedule;
     }
 
-    @Transactional
-    public void leaveSchedule(String url, Profile profile) {
-        Schedule schedule = getSchedule(url);
-        ScheduleProfile scheduleProfile = scheduleProfileRepository.findByScheduleAndProfile(schedule, profile);
-        scheduleProfileRepository.delete(scheduleProfile);
-
-        long remainingProfiles = scheduleProfileRepository.countBySchedule(schedule);
-        if (remainingProfiles == 0) {
-            schedule.setDeletedAt(LocalDateTime.now());
-        }
+    public void deleteSchedule(Schedule schedule) {
+        schedule.setDeletedAt(LocalDateTime.now());
     }
 
-    @Transactional
-    public void deleteSchedule(String url) {
-        Schedule schedule = getSchedule(url);
+    public void deleteScheduleProfile(ScheduleProfile scheduleProfile) {
+        scheduleProfileRepository.delete(scheduleProfile);
+    }
+
+    public void deleteScheduleProfile(Profile profile) {
+        scheduleProfileRepository.deleteByProfile(profile);
+    }
+
+    public void deleteScheduleProfile(Schedule schedule) {
         scheduleProfileRepository.deleteBySchedule(schedule);
-        schedule.setDeletedAt(LocalDateTime.now());
     }
 
     private String generateUniqueUrl() {

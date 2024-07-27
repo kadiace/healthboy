@@ -18,6 +18,9 @@ import org.springframework.stereotype.Repository;
 public interface ScheduleProfileRepository extends JpaRepository<ScheduleProfile, Long> {
     ScheduleProfile findByScheduleAndProfile(Schedule schedule, Profile profile);
 
+    @Query("SELECT sp FROM ScheduleProfile sp WHERE sp.schedule.url = :url AND sp.profile = :profile")
+    ScheduleProfile findByScheduleUrlAndProfile(@Param("url") String url, @Param("profile") Profile profile);
+
     @Query("SELECT sp.schedule FROM ScheduleProfile sp WHERE sp.profile = :profile")
     List<Schedule> findSchedulesByProfile(@Param("profile") Profile profile);
 
