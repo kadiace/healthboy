@@ -34,32 +34,41 @@ public class ScheduleController {
     @Autowired
     private TimeBlockService timeBlockService;
 
+    @Transactional
     @PostMapping
     public ResponseEntity<ScheduleDto> createSchedule(HttpServletRequest request,
             @RequestBody ScheduleCreateDto scheduleCreateDto) {
+
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
 
         Schedule createdSchedule = scheduleService.createSchedule(scheduleCreateDto, profile);
+        scheduleService.createScheduleProfile(createdSchedule, profile);
 
-        ScheduleDto scheduleDto = new ScheduleDto(createdSchedule.getUrl(), createdSchedule.getName(),
-                createdSchedule.getDescription());
+        ScheduleDto scheduleDto = new ScheduleDto(createdSchedule);
 
         return ResponseEntity.ok(scheduleDto);
     }
 
     @PostMapping("/{url}/join")
-    public ResponseEntity<String> joinSchedule(HttpServletRequest request, @PathVariable String url)
-            throws ApplicationException {
+    public ResponseEntity<String> joinSchedule(HttpServletRequest request, @PathVariable String url) {
+
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
         Schedule schedule = scheduleService.getSchedule(url);
-        scheduleService.joinSchedule(schedule, profile);
+
+        // Check if the ScheduleProfile already exists
+        if (scheduleService.existScheduleProfile(schedule, profile)) {
+            throw new ApplicationException("Profile is already part of this schedule", HttpStatus.BAD_REQUEST);
+        }
+
+        scheduleService.createScheduleProfile(schedule, profile);
         return ResponseEntity.ok("Join schedule successfully");
     }
 
     @GetMapping("/{url}")
     public ResponseEntity<ScheduleDto> getSchedule(HttpServletRequest request) {
+
         ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
         Schedule schedule = scheduleProfile.getSchedule();
 
@@ -69,8 +78,11 @@ public class ScheduleController {
     }
 
     @GetMapping("/{url}/users")
-    public ResponseEntity<List<ProfileDto>> getScheduleMember(@PathVariable String url) {
-        Schedule schedule = scheduleService.getSchedule(url);
+    public ResponseEntity<List<ProfileDto>> getScheduleMember(HttpServletRequest request) {
+
+        ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
+        Schedule schedule = scheduleProfile.getSchedule();
+
         List<Profile> profiles = scheduleService.getScheduleMembers(schedule);
 
         List<ProfileDto> profileDtos = profiles.stream().map(ProfileDto::new).toList();
@@ -84,46 +96,48 @@ public class ScheduleController {
         return ResponseEntity.ok(timeBlocks);
     }
 
-    @Transactional
     @PutMapping("/{url}")
-    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable String url,
+    public ResponseEntity<ScheduleDto> updateSchedule(HttpServletRequest request,
             @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
-        Schedule schedule = scheduleService.getSchedule(url);
+
+        ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
+        Schedule schedule = scheduleProfile.getSchedule();
+
         Schedule updatedSchedule = scheduleService.updateSchedule(schedule, scheduleUpdateDto);
+
         ScheduleDto scheduleDto = new ScheduleDto(updatedSchedule);
+
         return ResponseEntity.ok(scheduleDto);
     }
 
     @Transactional
     @DeleteMapping("/{url}/leave")
-    public ResponseEntity<String> leaveSchedule(HttpServletRequest request, @PathVariable String url) {
-
-        // Get Info
-        User user = (User) request.getAttribute("user");
-        Profile profile = user.getProfile();
-        Schedule schedule = scheduleService.getSchedule(url);
+    public ResponseEntity<String> leaveSchedule(HttpServletRequest request) {
 
         // Delete SP
-        ScheduleProfile scheduleProfile = scheduleService.getScheduleProfile(schedule, profile);
-        if (scheduleProfile == null) {
-            throw new ApplicationException("ScheduleProfile not found", HttpStatus.BAD_REQUEST);
-        }
+        ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
         scheduleService.deleteScheduleProfile(scheduleProfile);
 
         // Delete Schedule when member 0
+        Schedule schedule = scheduleProfile.getSchedule();
         long remainingProfiles = scheduleService.countScheduleProfile(schedule);
         if (remainingProfiles == 0) {
             schedule.setDeletedAt(LocalDateTime.now());
         }
+
         return ResponseEntity.ok("Leave scheudle successfully");
     }
 
     @Transactional
     @DeleteMapping("/{url}")
-    public ResponseEntity<String> deleteSchedule(HttpServletRequest request, @PathVariable String url) {
-        Schedule schedule = scheduleService.getSchedule(url);
+    public ResponseEntity<String> deleteSchedule(HttpServletRequest request) {
+
+        ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
+        Schedule schedule = scheduleProfile.getSchedule();
+
         scheduleService.deleteSchedule(schedule);
         scheduleService.deleteScheduleProfile(schedule);
+
         return ResponseEntity.ok("Delete schedule successfully");
     }
 }

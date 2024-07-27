@@ -14,8 +14,10 @@ import com.example.healthboy.user.entity.User;
 import com.example.healthboy.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -42,8 +44,11 @@ public class UserController {
     public ResponseEntity<List<ScheduleDto>> getMySchedules(HttpServletRequest request) {
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
+
         List<Schedule> schedules = scheduleService.getMySchedules(profile);
+
         List<ScheduleDto> scheduleDtos = schedules.stream().map(ScheduleDto::new).toList();
+
         return ResponseEntity.ok(scheduleDtos);
     }
 
@@ -60,12 +65,17 @@ public class UserController {
         return ResponseEntity.ok(profileDto);
     }
 
+    @Transactional
     @DeleteMapping
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
 
         User user = (User) request.getAttribute("user");
-        userService.deleteUser(user);
-        scheduleService.deleteScheduleProfile(user.getProfile());
+        Profile profile = user.getProfile();
+        LocalDateTime now = LocalDateTime.now();
+
+        userService.deleteUser(user, now);
+        userService.deleteProfile(profile, now);
+        scheduleService.deleteScheduleProfile(profile);
 
         return ResponseEntity.ok("User delete successfully");
     }

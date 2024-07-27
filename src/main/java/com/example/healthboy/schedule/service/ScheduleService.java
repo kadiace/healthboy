@@ -35,27 +35,16 @@ public class ScheduleService {
         schedule.setName(scheduleCreateDto.getName());
         schedule.setDescription(scheduleCreateDto.getDescription());
         Schedule savedSchedule = scheduleRepository.save(schedule);
-
-        ScheduleProfile scheduleProfile = new ScheduleProfile();
-        scheduleProfile.setProfile(profile);
-        scheduleProfile.setSchedule(savedSchedule);
-
-        scheduleProfileRepository.save(scheduleProfile);
-
         return savedSchedule;
     }
 
     @Transactional
-    public void joinSchedule(Schedule schedule, Profile profile) {
-
-        // Check if the ScheduleProfile already exists
-        if (scheduleProfileRepository.existsByScheduleAndProfile(schedule, profile)) {
-            throw new ApplicationException("Profile is already part of this schedule", HttpStatus.BAD_REQUEST);
-        }
+    public ScheduleProfile createScheduleProfile(Schedule schedule, Profile profile) {
         ScheduleProfile scheduleProfile = new ScheduleProfile();
         scheduleProfile.setSchedule(schedule);
         scheduleProfile.setProfile(profile);
-        scheduleProfileRepository.save(scheduleProfile);
+        ScheduleProfile createdScheduleProfile = scheduleProfileRepository.save(scheduleProfile);
+        return createdScheduleProfile;
     }
 
     public Schedule getSchedule(String url) {
@@ -86,6 +75,11 @@ public class ScheduleService {
         return scheduleProfileRepository.countBySchedule(schedule);
     }
 
+    public boolean existScheduleProfile(Schedule schedule, Profile profile) {
+        return scheduleProfileRepository.existsByScheduleAndProfile(schedule, profile);
+    }
+
+    @Transactional
     public Schedule updateSchedule(Schedule schedule, ScheduleUpdateDto scheduleUpdateDto) {
         schedule.setName(scheduleUpdateDto.getName());
         schedule.setDescription(scheduleUpdateDto.getDescription());
@@ -96,14 +90,17 @@ public class ScheduleService {
         schedule.setDeletedAt(LocalDateTime.now());
     }
 
+    @Transactional
     public void deleteScheduleProfile(ScheduleProfile scheduleProfile) {
         scheduleProfileRepository.delete(scheduleProfile);
     }
 
+    @Transactional
     public void deleteScheduleProfile(Profile profile) {
         scheduleProfileRepository.deleteByProfile(profile);
     }
 
+    @Transactional
     public void deleteScheduleProfile(Schedule schedule) {
         scheduleProfileRepository.deleteBySchedule(schedule);
     }
