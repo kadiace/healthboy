@@ -7,6 +7,7 @@ import com.example.healthboy.schedule.dto.ScheduleUpdateDto;
 import com.example.healthboy.schedule.entity.Schedule;
 import com.example.healthboy.schedule.entity.ScheduleProfile;
 import com.example.healthboy.schedule.service.ScheduleService;
+import com.example.healthboy.timeblock.dto.TimeBlockDto;
 import com.example.healthboy.timeblock.entity.TimeBlock;
 import com.example.healthboy.timeblock.service.TimeBlockService;
 import com.example.healthboy.user.dto.ProfileDto;
@@ -16,10 +17,13 @@ import com.example.healthboy.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -72,8 +76,8 @@ public class ScheduleController {
         ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
         Schedule schedule = scheduleProfile.getSchedule();
 
-        ScheduleDto scheduleDto = new ScheduleDto(schedule.getUrl(), schedule.getName(),
-                schedule.getDescription());
+        ScheduleDto scheduleDto = new ScheduleDto(schedule);
+
         return ResponseEntity.ok(scheduleDto);
     }
 
@@ -91,9 +95,28 @@ public class ScheduleController {
     }
 
     @GetMapping("/{url}/time-blocks")
-    public ResponseEntity<List<TimeBlock>> getTimeBlocks() {
-        List<TimeBlock> timeBlocks = timeBlockService.getAllTimeBlocks();
-        return ResponseEntity.ok(timeBlocks);
+    public ResponseEntity<List<TimeBlockDto>> getTimeBlocks(HttpServletRequest request,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String end) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        Timestamp startTime = Timestamp.valueOf(LocalDateTime.parse(start, formatter));
+        Timestamp endTime = Timestamp.valueOf(LocalDateTime.parse(end, formatter));
+
+        // Get Request Attributes
+        ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
+
+        // Get Time Blocks
+        List<TimeBlock> timeBlocks = timeBlockService.getTimeBlocks(scheduleProfile, startTime, endTime);
+
+        // Parse
+        List<TimeBlockDto> timeBlockDtos = timeBlocks.stream().map(timeBlock -> {
+            TimeBlockDto timeBlockDto = new TimeBlockDto(timeBlock);
+            timeBlockDto.setProfile(timeBlock.getScheduleProfile().getProfile());
+            return timeBlockDto;
+        }).toList();
+
+        return ResponseEntity.ok(timeBlockDtos);
     }
 
     @PutMapping("/{url}")

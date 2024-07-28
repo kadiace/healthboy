@@ -1,9 +1,11 @@
 package com.example.healthboy.common.middleware;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.example.healthboy.common.ApplicationException;
 import com.example.healthboy.common.Util;
 import com.example.healthboy.common.security.GoogleTokenVerifier;
 import com.example.healthboy.user.entity.User;
@@ -60,7 +62,6 @@ public class JwtRequestInterceptor implements HandlerInterceptor {
             }
         }
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return false;
+        throw new ApplicationException("Check token is valid", HttpStatus.UNAUTHORIZED);
     }
 }

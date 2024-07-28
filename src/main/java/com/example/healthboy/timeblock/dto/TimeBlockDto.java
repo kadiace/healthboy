@@ -1,11 +1,31 @@
 package com.example.healthboy.timeblock.dto;
 
+import java.sql.Timestamp;
+
+import com.example.healthboy.timeblock.entity.TimeBlock;
+import com.example.healthboy.user.dto.ProfileDto;
+import com.example.healthboy.user.entity.Profile;
+
 public class TimeBlockDto {
+
+    public TimeBlockDto(Long id, Timestamp startTime, Timestamp endTime, ProfileDto profile) {
+        this.id = id;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.profile = profile;
+    }
+
+    public TimeBlockDto(TimeBlock timeBlock) {
+        this.id = timeBlock.getId();
+        this.startTime = timeBlock.getStartTime();
+        this.endTime = timeBlock.getEndTime();
+        this.profile = new ProfileDto(timeBlock.getScheduleProfile().getProfile());
+    }
+
     private Long id;
-    private String email;
-    private String googleId;
-    private String facebookId;
-    private String githubId;
+    private Timestamp startTime;
+    private Timestamp endTime;
+    private ProfileDto profile;
 
     // Getters and setters
     public Long getId() {
@@ -16,35 +36,32 @@ public class TimeBlockDto {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public Timestamp getStartTime() {
+        return startTime;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
     }
 
-    public String getGoogleId() {
-        return googleId;
+    public Timestamp getEndTime() {
+        return endTime;
     }
 
-    public void setGoogleId(String googleId) {
-        this.googleId = googleId;
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
     }
 
-    public String getFacebookId() {
-        return facebookId;
+    public ProfileDto getProfile() {
+        return profile;
     }
 
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
+    public void setProfile(ProfileDto profile) {
+        this.profile = profile;
     }
 
-    public String getGithubId() {
-        return githubId;
+    public void setProfile(Profile profile) {
+        this.profile = new ProfileDto(profile);
     }
 
-    public void setGithubId(String githubId) {
-        this.githubId = githubId;
-    }
 }
