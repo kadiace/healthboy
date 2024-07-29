@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ScheduleService {
@@ -30,10 +29,7 @@ public class ScheduleService {
 
     @Transactional
     public Schedule createSchedule(ScheduleCreateDto scheduleCreateDto, Profile profile) {
-        Schedule schedule = new Schedule();
-        schedule.setUrl(generateUniqueUrl());
-        schedule.setName(scheduleCreateDto.getName());
-        schedule.setDescription(scheduleCreateDto.getDescription());
+        Schedule schedule = new Schedule(scheduleCreateDto);
         Schedule savedSchedule = scheduleRepository.save(schedule);
         return savedSchedule;
     }
@@ -79,44 +75,33 @@ public class ScheduleService {
         return scheduleProfileRepository.existsByScheduleAndProfile(schedule, profile);
     }
 
-    @Transactional
     public Schedule updateSchedule(Schedule schedule, ScheduleUpdateDto scheduleUpdateDto) {
         schedule.setName(scheduleUpdateDto.getName());
         schedule.setDescription(scheduleUpdateDto.getDescription());
         return schedule;
     }
 
-    @Transactional
     public void deleteSchedule(Schedule schedule) {
         schedule.setDeletedAt(LocalDateTime.now());
     }
 
-    @Transactional
     public void deleteScheduleWithNoProfiles(List<String> scheduleUrls) {
         scheduleRepository.deleteSchedulesWithNoProfiles(scheduleUrls, LocalDateTime.now());
     }
 
-    @Transactional
     public void deleteScheduleProfile(ScheduleProfile scheduleProfile) {
         scheduleProfileRepository.delete(scheduleProfile);
     }
 
-    @Transactional
     public void deleteScheduleProfiles(Profile profile) {
         scheduleProfileRepository.deleteByProfile(profile);
     }
 
-    @Transactional
     public void deleteScheduleProfiles(Schedule schedule) {
         scheduleProfileRepository.deleteBySchedule(schedule);
     }
 
-    @Transactional
     public void deleteScheduleProfiles(List<ScheduleProfile> scheduleProfiles) {
         scheduleProfileRepository.deleteAll(scheduleProfiles);
-    }
-
-    private String generateUniqueUrl() {
-        return UUID.randomUUID().toString().substring(0, 10).replace("-", "");
     }
 }

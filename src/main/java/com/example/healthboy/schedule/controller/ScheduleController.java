@@ -119,6 +119,7 @@ public class ScheduleController {
         return ResponseEntity.ok(timeBlockDtos);
     }
 
+    @Transactional
     @PutMapping("/{url}")
     public ResponseEntity<ScheduleDto> updateSchedule(HttpServletRequest request,
             @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
