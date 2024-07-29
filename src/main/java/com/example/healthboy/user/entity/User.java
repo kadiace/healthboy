@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.http.HttpStatus;
+
+import com.example.healthboy.common.ApplicationException;
+import com.example.healthboy.common.enums.SSOType;
 
 import jakarta.persistence.*;
 
@@ -51,28 +55,48 @@ public class User {
         this.email = email;
     }
 
-    public String getGoogleId() {
-        return googleId;
+    public String getTokenId(SSOType ssoType) {
+        switch (ssoType) {
+            case GOOGLE:
+                return googleId;
+
+            case FACEBOOK:
+                return facebookId;
+
+            case GITHUB:
+                return githubId;
+        }
+        throw new ApplicationException("Invalid SSO Type", HttpStatus.BAD_REQUEST);
     }
 
-    public void setGoogleId(String googleId) {
-        this.googleId = googleId;
+    public void setTokenId(SSOType ssoType, String tokenId) {
+        switch (ssoType) {
+            case GOOGLE:
+                this.googleId = tokenId;
+                break;
+
+            case FACEBOOK:
+                this.facebookId = tokenId;
+                break;
+
+            case GITHUB:
+                this.githubId = tokenId;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public String getGoogleId() {
+        return googleId;
     }
 
     public String getFacebookId() {
         return facebookId;
     }
 
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
-    }
-
     public String getGithubId() {
         return githubId;
-    }
-
-    public void setGithubId(String githubId) {
-        this.githubId = githubId;
     }
 
     public Profile getProfile() {
@@ -93,6 +117,7 @@ public class User {
 
     // Original Method
     public boolean isValid() {
-        return this.email != null && !this.email.isEmpty() && this.profile != null;
+        return this.email != null && !this.email.isEmpty() && this.profile != null && this.profile.isValid()
+                && (this.googleId != null || this.facebookId != null || this.githubId != null);
     }
 }

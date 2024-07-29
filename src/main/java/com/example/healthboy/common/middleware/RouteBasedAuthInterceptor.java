@@ -33,7 +33,9 @@ public class RouteBasedAuthInterceptor implements HandlerInterceptor {
 
         String requestUri = request.getRequestURI();
 
-        if (requestUri.startsWith("/api/users")) {
+        if (requestUri.startsWith("/api/auths")) {
+            return true;
+        } else if (requestUri.startsWith("/api/users")) {
             return true;
         } else if (requestUri.startsWith("/api/schedules")) {
             return ScheduleInterceptor(request, response, handler);

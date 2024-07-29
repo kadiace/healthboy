@@ -93,4 +93,9 @@ public class Profile {
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
+
+    // Original method
+    public boolean isValid() {
+        return this.firstName != null && this.lastName != null && this.profileImage != null;
+    }
 }

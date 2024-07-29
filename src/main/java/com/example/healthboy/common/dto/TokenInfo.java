@@ -1,12 +1,17 @@
-package com.example.healthboy.user.dto;
+package com.example.healthboy.common.dto;
 
 import com.example.healthboy.common.enums.SSOType;
 
-public class UserIntegrationDto {
-    private SSOType ssoType;
+public class TokenInfo {
     private String tokenId;
+    private SSOType ssoType;
 
-    // Getters and setters
+    public TokenInfo(String tokenId, SSOType ssoType) {
+        this.tokenId = tokenId;
+        this.ssoType = ssoType;
+    }
+
+    // Getters and Setters
     public String getTokenId() {
         return tokenId;
     }
@@ -22,4 +27,5 @@ public class UserIntegrationDto {
     public void setSsoType(SSOType ssoType) {
         this.ssoType = ssoType;
     }
+
 }

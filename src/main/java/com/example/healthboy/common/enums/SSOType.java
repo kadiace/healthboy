@@ -1,5 +1,5 @@
 
-package com.example.healthboy.user.enums;
+package com.example.healthboy.common.enums;
 
 public enum SSOType {
     GOOGLE,
