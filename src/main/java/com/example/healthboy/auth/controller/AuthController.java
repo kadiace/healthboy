@@ -57,7 +57,7 @@ public class AuthController {
                 GoogleIdToken.Payload payload = googleTokenVerifier.verifyGoogleToken(givenToken);
 
                 if (payload == null) {
-                    return ResponseEntity.status(401).body("Invalid token");
+                    throw new ApplicationException("Invalid SSO token", HttpStatus.BAD_REQUEST);
                 }
 
                 tokenId = payload.getSubject();
@@ -83,7 +83,7 @@ public class AuthController {
 
         // Check SSO token valid
         if (tokenId == null) {
-            throw new ApplicationException("Invalid SSO token", HttpStatus.BAD_REQUEST);
+            throw new ApplicationException("Token id not found", HttpStatus.BAD_REQUEST);
         }
 
         // Check user entity created well
@@ -119,7 +119,7 @@ public class AuthController {
                 GoogleIdToken.Payload payload = googleTokenVerifier.verifyGoogleToken(givenToken);
 
                 if (payload == null) {
-                    return ResponseEntity.status(401).body("Invalid token");
+                    throw new ApplicationException("Invalid SSO token", HttpStatus.BAD_REQUEST);
                 }
                 tokenId = payload.getSubject();
                 break;
@@ -128,7 +128,7 @@ public class AuthController {
         }
 
         if (tokenId == null) {
-            throw new ApplicationException("Token not found", HttpStatus.BAD_REQUEST);
+            throw new ApplicationException("Token id not found", HttpStatus.BAD_REQUEST);
         }
 
         User user = userService.getUser(ssoType, tokenId);
@@ -155,18 +155,19 @@ public class AuthController {
             case GOOGLE:
                 // Check already intergreated
                 if (user.getGoogleId() != null) {
-                    ResponseEntity.badRequest().body(userIntegrationDto.getSsoType() + " is already integrated");
+                    throw new ApplicationException(userIntegrationDto.getSsoType() + " is already integrated",
+                            HttpStatus.BAD_REQUEST);
                 }
 
                 // Get token payload
                 GoogleIdToken.Payload payload = googleTokenVerifier.verifyGoogleToken(userIntegrationDto.getTokenId());
                 if (payload == null) {
-                    return ResponseEntity.status(401).body("Invalid token");
+                    throw new ApplicationException("Invalid SSO token", HttpStatus.BAD_REQUEST);
                 }
 
                 // Check same user
                 if (!user.getEmail().equals(payload.getEmail())) {
-                    return ResponseEntity.status(401).body("User is not matched");
+                    throw new ApplicationException("User is not matched", HttpStatus.BAD_REQUEST);
                 }
 
                 // Get google SSO id
@@ -174,12 +175,14 @@ public class AuthController {
                 break;
             case FACEBOOK:
                 if (user.getFacebookId() != null) {
-                    ResponseEntity.badRequest().body(userIntegrationDto.getSsoType() + " is already integrated");
+                    throw new ApplicationException(userIntegrationDto.getSsoType() + " is already integrated",
+                            HttpStatus.BAD_REQUEST);
                 }
                 break;
             case GITHUB:
                 if (user.getGithubId() != null) {
-                    ResponseEntity.badRequest().body(userIntegrationDto.getSsoType() + " is already integrated");
+                    throw new ApplicationException(userIntegrationDto.getSsoType() + " is already integrated",
+                            HttpStatus.BAD_REQUEST);
                 }
                 break;
             default:
@@ -193,4 +196,5 @@ public class AuthController {
         userService.updateUserTokenId(user, userIntegrationDto.getSsoType(), tokenId);
         return ResponseEntity.ok(userIntegrationDto.getSsoType() + " intergration success");
     }
+
 }

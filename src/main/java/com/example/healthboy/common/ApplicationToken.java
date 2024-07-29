@@ -12,6 +12,7 @@ import com.example.healthboy.common.dto.TokenInfo;
 import com.example.healthboy.common.enums.SSOType;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -35,14 +36,28 @@ public class ApplicationToken {
     }
 
     public static TokenInfo decodeToken(String token) {
-        // Parse token
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = null;
+        try {// Parse token
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (JwtException e) {
+            throw new ApplicationException(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+
+        if (claims == null) {
+            throw new ApplicationException("Invalid token", HttpStatus.UNAUTHORIZED);
+        }
+
         String tokenId = (String) claims.get("tokenId");
         SSOType ssoType = Util.safeValueOf(SSOType.class, (String) claims.get("ssoType"));
+
+        if (tokenId == null || ssoType == null) {
+            throw new ApplicationException("Invalid token", HttpStatus.UNAUTHORIZED);
+        }
+
         Date validDate = claims.getExpiration();
 
         if (validDate.before(new Date())) {
@@ -50,6 +65,7 @@ public class ApplicationToken {
         }
 
         return new TokenInfo(tokenId, ssoType);
+
     }
 
 }

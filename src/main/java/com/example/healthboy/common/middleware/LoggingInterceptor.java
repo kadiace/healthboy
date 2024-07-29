@@ -16,21 +16,17 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull Object handler) {
+            @NonNull Object handler) throws Exception {
+        logRequestDetails(request);
+        return true;
+    }
 
-        if (request == null || response == null || handler == null) {
-            logger.warning("Received null value(s) in LoggingInterceptor: " +
-                    "request = " + request + ", response = " + response + ", handler = " + handler);
-            return true; // Continue with the next interceptor or the handler itself
-        }
-
+    private void logRequestDetails(HttpServletRequest request) {
         String httpMethod = request.getMethod();
         String userAgent = request.getHeader("User-Agent");
         String clientIp = request.getRemoteAddr();
         String requestPath = request.getRequestURI();
 
         logger.info("[" + httpMethod + "] " + requestPath + " - " + userAgent + " " + clientIp);
-
-        return true; // Continue with the next interceptor or the handler itself
     }
 }
