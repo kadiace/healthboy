@@ -44,6 +44,7 @@ public class TimeBlockController {
         return ResponseEntity.ok(timeBlockDto);
     }
 
+    @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<TimeBlockDto> updateTimeBlock(HttpServletRequest request,
             @RequestBody TimeBlockUpdateDto timeBlockUpdateDto) {
@@ -93,8 +94,8 @@ public class TimeBlockController {
         Timestamp postEndTime = timeBlock.getEndTime();
 
         // Check divide time is valid
-        if (prevStartTime.before(prevEndTime)
-                && postEndTime.after(postStartTime)) {
+        if (!(prevStartTime.before(prevEndTime)
+                && postEndTime.after(postStartTime))) {
             throw new ApplicationException("{Here}", HttpStatus.BAD_REQUEST);
         }
 

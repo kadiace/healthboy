@@ -29,8 +29,7 @@ public class RouteBasedAuthInterceptor implements HandlerInterceptor {
     private TimeBlockService timeBlockService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         String requestUri = request.getRequestURI();
 
@@ -78,7 +77,7 @@ public class RouteBasedAuthInterceptor implements HandlerInterceptor {
 
         String method = request.getMethod();
         Profile profile = ((User) request.getAttribute("user")).getProfile();
-        String scheduleUrl = (String) request.getAttribute("url");
+        String scheduleUrl = request.getHeader("Schedule-Url");
 
         switch (method) {
             case "POST":
@@ -101,7 +100,6 @@ public class RouteBasedAuthInterceptor implements HandlerInterceptor {
 
                     // Check user create time block
                     TimeBlock timeBlock = timeBlockService.getTimeBlock(timeBlockId);
-
                     if (timeBlock.getScheduleProfile().getSchedule().getUrl().equals(scheduleUrl)
                             && timeBlock.getScheduleProfile().getProfile().getId() == profile.getId()) {
                         request.setAttribute("timeBlock", timeBlock);

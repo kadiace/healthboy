@@ -23,6 +23,9 @@ import java.sql.Timestamp;
 })
 public class TimeBlock {
 
+    public TimeBlock() {
+    }
+
     public TimeBlock(Timestamp startTime, Timestamp endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
