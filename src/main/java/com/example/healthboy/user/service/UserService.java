@@ -56,7 +56,8 @@ public class UserService {
     public Profile updateProfile(Profile profile, ProfileUpdateDto userUpdateDto) {
         profile.setFirstName(userUpdateDto.getFirstName());
         profile.setLastName(userUpdateDto.getLastName());
-        profile.setProfileImage(userUpdateDto.getProfileImage());
+        profile.setProfileImage(userUpdateDto.getProfileImage() != null ? userUpdateDto.getProfileImage()
+                : "image/profile/default.png");
         return profile;
     }
 

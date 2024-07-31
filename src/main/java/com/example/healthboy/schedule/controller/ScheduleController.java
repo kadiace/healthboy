@@ -16,6 +16,7 @@ import com.example.healthboy.user.entity.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -41,7 +42,7 @@ public class ScheduleController {
     @Transactional
     @PostMapping
     public ResponseEntity<ScheduleDto> createSchedule(HttpServletRequest request,
-            @RequestBody ScheduleCreateDto scheduleCreateDto) {
+            @Valid @RequestBody ScheduleCreateDto scheduleCreateDto) {
 
         User user = (User) request.getAttribute("user");
         Profile profile = user.getProfile();
@@ -122,7 +123,7 @@ public class ScheduleController {
     @Transactional
     @PutMapping("/{url}")
     public ResponseEntity<ScheduleDto> updateSchedule(HttpServletRequest request,
-            @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
+            @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto) {
 
         ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
         Schedule schedule = scheduleProfile.getSchedule();

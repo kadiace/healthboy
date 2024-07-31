@@ -1,13 +1,13 @@
 package com.example.healthboy.user.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public class ProfileUpdateDto {
 
-    @NotNull(message = "First name must not be null")
+    @NotBlank(message = "First name must not be null")
     private String firstName;
 
-    @NotNull(message = "Last name must not be null")
+    @NotBlank(message = "Last name must not be null")
     private String lastName;
 
     private String profileImage;

@@ -1,9 +1,15 @@
-package com.example.healthboy.user.dto;
+package com.example.healthboy.auth.dto;
 
 import com.example.healthboy.common.enums.SSOType;
 
-public class UserIntegrationDto {
+import jakarta.validation.constraints.NotBlank;
+
+public class IntegrationDto {
+
+    @NotBlank(message = "SSO type must not be null")
     private SSOType ssoType;
+
+    @NotBlank(message = "Token id must not be null")
     private String tokenId;
 
     // Getters and setters

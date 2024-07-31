@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.healthboy.auth.dto.SignInDto;
 import com.example.healthboy.auth.dto.SignUpDto;
+import com.example.healthboy.auth.dto.IntegrationDto;
 import com.example.healthboy.common.ApplicationException;
 import com.example.healthboy.common.ApplicationToken;
 import com.example.healthboy.common.enums.SSOType;
 import com.example.healthboy.common.security.GoogleTokenVerifier;
-import com.example.healthboy.user.dto.UserIntegrationDto;
 import com.example.healthboy.user.entity.Profile;
 import com.example.healthboy.user.entity.User;
 import com.example.healthboy.user.service.UserService;
@@ -23,6 +23,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auths")
@@ -36,7 +37,7 @@ public class AuthController {
 
     @Transactional
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<String> signUp(@Valid @RequestBody SignUpDto signUpDto) {
 
         String givenToken = signUpDto.getToken();
         SSOType ssoType = signUpDto.getSsoType();
@@ -108,7 +109,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@RequestBody SignInDto signInDto) {
+    public ResponseEntity<String> signIn(@Valid @RequestBody SignInDto signInDto) {
 
         String givenToken = signInDto.getToken();
         SSOType ssoType = signInDto.getSsoType();
@@ -146,7 +147,7 @@ public class AuthController {
     @Transactional
     @PostMapping("/integration")
     public ResponseEntity<String> postMethodName(HttpServletRequest request,
-            @RequestBody UserIntegrationDto userIntegrationDto) throws GeneralSecurityException, IOException {
+            @Valid @RequestBody IntegrationDto userIntegrationDto) throws GeneralSecurityException, IOException {
 
         User user = (User) request.getAttribute("user");
         String tokenId = null;

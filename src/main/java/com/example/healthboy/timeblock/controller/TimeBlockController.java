@@ -14,6 +14,7 @@ import com.example.healthboy.user.entity.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class TimeBlockController {
 
     @PostMapping
     public ResponseEntity<TimeBlockDto> createTimeBlock(HttpServletRequest request,
-            @RequestBody TimeBlockCreateDto timeBlockCreateDto) {
+            @Valid @RequestBody TimeBlockCreateDto timeBlockCreateDto) {
 
         ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
 
@@ -47,7 +48,7 @@ public class TimeBlockController {
     @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<TimeBlockDto> updateTimeBlock(HttpServletRequest request,
-            @RequestBody TimeBlockUpdateDto timeBlockUpdateDto) {
+            @Valid @RequestBody TimeBlockUpdateDto timeBlockUpdateDto) {
 
         TimeBlock timeBlock = (TimeBlock) request.getAttribute("timeBlock");
 
@@ -61,7 +62,7 @@ public class TimeBlockController {
     @Transactional
     @PutMapping("/{id}/merge")
     public ResponseEntity<TimeBlockDto> mergeTimeBlock(HttpServletRequest request,
-            @RequestBody TimeBlockMergeDto timeBlockMergeDto) {
+            @Valid @RequestBody TimeBlockMergeDto timeBlockMergeDto) {
 
         TimeBlock timeBlock = (TimeBlock) request.getAttribute("timeBlock");
         Profile profile = ((User) request.getAttribute("user")).getProfile();
@@ -85,7 +86,7 @@ public class TimeBlockController {
     @Transactional
     @PutMapping("/{id}/divide")
     public ResponseEntity<List<TimeBlockDto>> divideTimeBlock(HttpServletRequest request,
-            @RequestBody TimeBlockDivideDto timeBlockDivideDto) {
+            @Valid @RequestBody TimeBlockDivideDto timeBlockDivideDto) {
 
         TimeBlock timeBlock = (TimeBlock) request.getAttribute("timeBlock");
         Timestamp prevStartTime = timeBlock.getStartTime();
@@ -116,8 +117,9 @@ public class TimeBlockController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTimeBlock(@PathVariable Long id) {
-        timeBlockService.deleteTimeBlock(id);
+    public ResponseEntity<String> deleteTimeBlock(HttpServletRequest request) {
+        TimeBlock timeBlock = (TimeBlock) request.getAttribute("timeBlock");
+        timeBlockService.deleteTimeBlock(timeBlock);
         return ResponseEntity.ok("Time block delete Successfully");
     }
 }

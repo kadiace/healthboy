@@ -1,12 +1,16 @@
 package com.example.healthboy.schedule.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class ScheduleUpdateDto {
 
+    @NotBlank(message = "Schedule name must not be null")
     @Size(max = 20, message = "Name must be under 20 characters")
     private String name;
 
+    @NotNull(message = "Description must exist")
     @Size(max = 30, message = "Description must be under 30 characters")
     private String description;
 
