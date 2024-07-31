@@ -29,4 +29,9 @@ public interface TimeBlockRepository extends JpaRepository<TimeBlock, Long> {
             @Param("startTime") Timestamp startTime,
             @Param("endTime") Timestamp endTime);
 
+    @Query("SELECT count(tb) FROM TimeBlock tb WHERE tb.scheduleProfile = :scheduleProfile AND (tb.endTime > :startTime OR tb.startTime < :endTime)")
+    long countBySPAndTimeRange(@Param("scheduleProfile") ScheduleProfile scheduleProfile,
+            @Param("startTime") Timestamp startTime,
+            @Param("endTime") Timestamp endTime);
+
 }

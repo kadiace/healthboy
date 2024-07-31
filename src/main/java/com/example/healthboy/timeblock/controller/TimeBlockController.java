@@ -38,6 +38,12 @@ public class TimeBlockController {
 
         ScheduleProfile scheduleProfile = (ScheduleProfile) request.getAttribute("scheduleProfile");
 
+        long remainingTimeBlocks = timeBlockService.countTimeBlock(scheduleProfile, timeBlockCreateDto.getStartTime(),
+                timeBlockCreateDto.getEndTime());
+        if (remainingTimeBlocks > 0) {
+            throw new ApplicationException("Time block already exist in requested time", HttpStatus.BAD_REQUEST);
+        }
+
         TimeBlock createdTimeBlock = timeBlockService.createTimeBlock(timeBlockCreateDto, scheduleProfile);
 
         TimeBlockDto timeBlockDto = new TimeBlockDto(createdTimeBlock);

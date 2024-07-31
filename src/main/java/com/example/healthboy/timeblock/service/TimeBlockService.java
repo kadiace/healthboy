@@ -56,6 +56,10 @@ public class TimeBlockService {
         return timeBlock.getScheduleProfile().getProfile().getId() == profileId;
     }
 
+    public Long countTimeBlock(ScheduleProfile scheduleProfile, Timestamp startTime, Timestamp endTime) {
+        return timeBlockRepository.countBySPAndTimeRange(scheduleProfile, startTime, endTime);
+    }
+
     public TimeBlock updateTimeBlock(TimeBlock timeBlock, TimeBlockUpdateDto timeBlockUpdateDto) {
         timeBlock.setStartTime(timeBlockUpdateDto.getStartTime());
         timeBlock.setEndTime(timeBlockUpdateDto.getEndTime());
