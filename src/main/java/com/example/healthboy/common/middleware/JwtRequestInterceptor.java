@@ -27,7 +27,8 @@ public class JwtRequestInterceptor implements HandlerInterceptor {
 
         // Pass guard when path is /api/auths/sign-up
         String requestUri = request.getRequestURI();
-        if (requestUri.equals("/api/auths/sign-up") || requestUri.equals("/api/auths/sign-in")) {
+        if (requestUri.equals("/api/health") || requestUri.equals("/api/auths/sign-up")
+                || requestUri.equals("/api/auths/sign-in")) {
             return true;
         }
 
