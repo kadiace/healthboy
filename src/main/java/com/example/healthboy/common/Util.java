@@ -2,14 +2,20 @@ package com.example.healthboy.common;
 
 import java.util.logging.Logger;
 
-import com.example.healthboy.common.middleware.LoggingInterceptor;
+import org.springframework.core.env.Environment;
 
 public class Util {
 
-    private static final Logger logger = Logger.getLogger(LoggingInterceptor.class.getName());
+    private static final Logger logger = Logger.getLogger(Util.class.getName());
 
     // Private constructor to prevent instantiation
     private Util() {
+    }
+
+    public static boolean isLocal() {
+        Environment environment = ApplicationContextProvider.getApplicationContext().getEnvironment();
+        String activeProfile = environment.getProperty("spring.profiles.active");
+        return "local".equals(activeProfile);
     }
 
     /**

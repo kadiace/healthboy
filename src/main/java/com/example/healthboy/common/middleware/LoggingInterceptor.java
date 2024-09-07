@@ -17,8 +17,24 @@ public class LoggingInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull Object handler) throws Exception {
+
+        long startTime = System.currentTimeMillis();
+        request.setAttribute("startTime", startTime);
+
         logRequestDetails(request);
         return true;
+    }
+
+    @Override
+    public void afterCompletion(@NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull Object handler,
+            Exception ex) throws Exception {
+        long startTime = (Long) request.getAttribute("startTime");
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        logResponseDetails(request, response, duration);
     }
 
     private void logRequestDetails(HttpServletRequest request) {
@@ -27,6 +43,16 @@ public class LoggingInterceptor implements HandlerInterceptor {
         String clientIp = request.getRemoteAddr();
         String requestPath = request.getRequestURI();
 
-        logger.info("[" + httpMethod + "] " + requestPath + " - " + userAgent + " " + clientIp);
+        logger.info("Request: [" + httpMethod + "] " + requestPath + " - User-Agent: " + userAgent + " - Client IP: "
+                + clientIp);
+    }
+
+    private void logResponseDetails(HttpServletRequest request, HttpServletResponse response, long duration) {
+        String httpMethod = request.getMethod();
+        String requestPath = request.getRequestURI();
+        int status = response.getStatus();
+
+        logger.info("Response: [" + httpMethod + "] " + requestPath + " - Status: " + status + " - Time taken: "
+                + duration + "ms");
     }
 }

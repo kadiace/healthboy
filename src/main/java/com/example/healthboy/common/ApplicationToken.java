@@ -19,7 +19,9 @@ import io.jsonwebtoken.security.Keys;
 
 public class ApplicationToken {
 
-    private static final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final SecretKey key = Util.isLocal()
+            ? Keys.hmacShaKeyFor("my-very-strong-secure-local-secret-key".getBytes())
+            : Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public static String generateToken(String tokenId, SSOType ssoType) {
 
@@ -44,18 +46,18 @@ public class ApplicationToken {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (JwtException e) {
-            throw new ApplicationException(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            throw new ApplicationException("JWTException: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         if (claims == null) {
-            throw new ApplicationException("Invalid token", HttpStatus.UNAUTHORIZED);
+            throw new ApplicationException("Token parsing failed: no claims found in token", HttpStatus.UNAUTHORIZED);
         }
 
         String tokenId = (String) claims.get("tokenId");
         SSOType ssoType = Util.safeValueOf(SSOType.class, (String) claims.get("ssoType"));
 
         if (tokenId == null || ssoType == null) {
-            throw new ApplicationException("Invalid token", HttpStatus.UNAUTHORIZED);
+            throw new ApplicationException("Token validation failed: token value is missing", HttpStatus.UNAUTHORIZED);
         }
 
         Date validDate = claims.getExpiration();
