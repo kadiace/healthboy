@@ -3,10 +3,11 @@ package com.example.healthboy.auth.dto;
 import com.example.healthboy.common.enums.SSOType;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class SignUpDto {
 
-    @NotBlank(message = "SSO type must not be null")
+    @NotNull(message = "SSO type must not be null")
     private SSOType ssoType;
 
     @NotBlank(message = "Token id must not be null")

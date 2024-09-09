@@ -3,6 +3,7 @@ package com.example.healthboy.common.middleware;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -33,87 +34,119 @@ public class RouteBasedAuthInterceptor implements HandlerInterceptor {
 
         String requestUri = request.getRequestURI();
 
-        if (requestUri.startsWith("/api/health")) {
-            return true;
-        } else if (requestUri.startsWith("/api/auths")) {
-            return true;
-        } else if (requestUri.startsWith("/api/users")) {
+        if (isPublicPath(requestUri)) {
             return true;
         } else if (requestUri.startsWith("/api/schedules")) {
             return ScheduleInterceptor(request, response, handler);
         } else if (requestUri.startsWith("/api/time-blocks")) {
             return TimeBlockInterceptor(request, response, handler);
         }
-        throw new ApplicationException("Check API path guard", HttpStatus.BAD_REQUEST);
+        throw new ApplicationException("Invalid API path", HttpStatus.BAD_REQUEST);
+    }
+
+    private boolean isPublicPath(String requestUri) {
+        return requestUri.startsWith("/api/health") || requestUri.startsWith("/api/auths")
+                || requestUri.startsWith("/api/users");
     }
 
     private boolean ScheduleInterceptor(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        String method = request.getMethod();
-
         // Pass guard when POST method.
-        if (method.equals("POST")) {
+        if (HttpMethod.POST.matches(request.getMethod())) {
             return true;
         }
 
         // Check if the handler is a method and extract the URL path variable
-        @SuppressWarnings("unchecked")
-        Map<String, String> pathVariables = (Map<String, String>) request
-                .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        Map<String, String> pathVariables = getPathVariables(request);
 
-        if (pathVariables != null && pathVariables.containsKey("url")) {
-            // Extract url, profile
-            String scheduleUrl = pathVariables.get("url");
-            Profile profile = ((User) request.getAttribute("user")).getProfile();
-
-            // Check user joined in schedule, save SP in context
-            ScheduleProfile scheduleProfile = scheduleService.getScheduleProfile(scheduleUrl, profile);
-            if (scheduleProfile == null) {
-                throw new ApplicationException("You are not a member of this schedule", HttpStatus.UNAUTHORIZED);
-            }
-            request.setAttribute("scheduleProfile", scheduleProfile);
-            return true;
+        if (!pathVariables.containsKey("url")) {
+            throw new ApplicationException("Access denied: cannot find path parmater 'url'", HttpStatus.UNAUTHORIZED);
         }
-        throw new ApplicationException("Fail to authorize schedule request", HttpStatus.UNAUTHORIZED);
+
+        // Extract url, profile
+        String scheduleUrl = pathVariables.get("url");
+        Profile profile = getUserProfile(request);
+
+        // Check user joined in schedule, save SP in context
+        checkScheduleMembership(scheduleUrl, profile, request);
+        return true;
     }
 
     private boolean TimeBlockInterceptor(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        String method = request.getMethod();
-        Profile profile = ((User) request.getAttribute("user")).getProfile();
         String scheduleUrl = request.getHeader("Schedule-Url");
+        Profile profile = getUserProfile(request);
 
-        switch (method) {
-            case "POST":
-                // Check user joined in schedule, save SP in context
-                ScheduleProfile scheduleProfile = scheduleService.getScheduleProfile(scheduleUrl, profile);
-                if (scheduleProfile == null) {
-                    throw new ApplicationException("You are not a member of this schedule", HttpStatus.UNAUTHORIZED);
-                }
-                request.setAttribute("scheduleProfile", scheduleProfile);
-                return true;
-
-            default:
-                @SuppressWarnings("unchecked")
-                Map<String, String> pathVariables = (Map<String, String>) request
-                        .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-
-                if (pathVariables != null && pathVariables.containsKey("id")) {
-                    // Extract id, profile, schedule url
-                    String timeBlockId = pathVariables.get("id");
-
-                    // Check user create time block
-                    TimeBlock timeBlock = timeBlockService.getTimeBlock(timeBlockId);
-                    if (timeBlock.getScheduleProfile().getSchedule().getUrl().equals(scheduleUrl)
-                            && timeBlock.getScheduleProfile().getProfile().getId() == profile.getId()) {
-                        request.setAttribute("timeBlock", timeBlock);
-                        return true;
-                    }
-                    throw new ApplicationException("You are not a creator of this time block", HttpStatus.UNAUTHORIZED);
-
-                }
-                throw new ApplicationException("Fail to authorize time block request", HttpStatus.UNAUTHORIZED);
+        if (scheduleUrl == null) {
+            throw new ApplicationException("Access denied: cannot find header 'Schedule-Url'", HttpStatus.UNAUTHORIZED);
         }
+
+        if (HttpMethod.POST.matches(request.getMethod())) {
+            checkScheduleMembership(scheduleUrl, profile, request);
+            return true;
+        }
+
+        // Check if the handler is a method and extract the URL path variable
+        Map<String, String> pathVariables = getPathVariables(request);
+
+        if (!pathVariables.containsKey("id")) {
+            throw new ApplicationException("Access denied: cannot find path parmater 'id'",
+                    HttpStatus.UNAUTHORIZED);
+        }
+        // Extract id, profile, schedule url
+        String timeBlockId = pathVariables.get("id");
+
+        // Check user create time block
+        TimeBlock timeBlock = getTimeBlock(timeBlockId);
+        if (!isOwnerOfTimeBlock(timeBlock, scheduleUrl, profile)) {
+            throw new ApplicationException("Access denied: not the owner of this time block",
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        request.setAttribute("timeBlock", timeBlock);
+        return true;
+
+    }
+
+    private Map<String, String> getPathVariables(HttpServletRequest request) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> pathVariables = (Map<String, String>) request
+                .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (pathVariables == null) {
+            throw new ApplicationException("Access denied: cannot find any path parmaters", HttpStatus.UNAUTHORIZED);
+        }
+        return pathVariables;
+    }
+
+    private Profile getUserProfile(HttpServletRequest request) {
+        User user = (User) request.getAttribute("user");
+        if (user == null) {
+            throw new ApplicationException("Route Interceptor: User not found in request", HttpStatus.UNAUTHORIZED);
+        }
+        return user.getProfile();
+    }
+
+    private void checkScheduleMembership(String scheduleUrl, Profile profile, HttpServletRequest request) {
+        ScheduleProfile scheduleProfile = scheduleService.getScheduleProfile(scheduleUrl, profile);
+        if (scheduleProfile == null) {
+            throw new ApplicationException("Access denied: not a member of this schedule", HttpStatus.UNAUTHORIZED);
+        }
+
+        request.setAttribute("scheduleProfile", scheduleProfile);
+    }
+
+    private TimeBlock getTimeBlock(String timeBlockId) {
+        TimeBlock timeBlock = timeBlockService.getTimeBlock(timeBlockId);
+        if (timeBlock == null) {
+            throw new ApplicationException("Access denied: Invalid time block id",
+                    HttpStatus.UNAUTHORIZED);
+        }
+        return timeBlock;
+    }
+
+    private boolean isOwnerOfTimeBlock(TimeBlock timeBlock, String scheduleUrl, Profile profile) {
+        return timeBlock.getScheduleProfile().getSchedule().getUrl().equals(scheduleUrl)
+                && timeBlock.getScheduleProfile().getProfile().getId().equals(profile.getId());
     }
 
 }
